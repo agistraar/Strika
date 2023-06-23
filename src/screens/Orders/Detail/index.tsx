@@ -8,13 +8,21 @@ import {
   Image,
 } from 'react-native';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParams} from '../../../Router';
 
 const Detail = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
     <SafeAreaView className="px-6 flex flex-col w-full h-screen justify-start items-center box-border">
       <View className="flex flex-row py-4 w-full h-fit items-center justify-between">
         <Text className="text-black text-xl font-bold">Detail Order</Text>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.pop();
+          }}>
           <Image source={require('../../../icons/close.png')} />
         </TouchableOpacity>
       </View>
