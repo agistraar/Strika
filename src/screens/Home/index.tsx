@@ -9,6 +9,9 @@ import {
   ImageBackground,
 } from 'react-native';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParams} from '../../Router';
 
 const Home = () => {
   return (
@@ -72,7 +75,7 @@ const CardMember = () => {
 
 const InfoSetrika = () => {
   return (
-    <View className=" flex w-full items-center justify-center pt-4">
+    <View className=" flex w-full items-center justify-center mt-4">
       <View className=" flex flex-col p-3 w-11/12 h-fit border-[1px] border-gray-300 rounded-t-3xl">
         <View className="flex flex-row items-center w-full h-fit space-x-2 ">
           <Image
@@ -106,7 +109,7 @@ const InfoSetrika = () => {
 
 const Paket = () => {
   return (
-    <View className="mr-4 ml-4 h-fit flex flex-col flex-wrap space-y-2 justify-center items-center pt-2 box-border">
+    <View className="mx-4 mt-4 h-fit flex flex-col flex-wrap space-y-2 justify-center items-center pt-2 box-border">
       <View className="w-full h-fit flex flex-row justify-between items-center">
         <Text className="text-base text-black">Paket Rekomendasi</Text>
         <Text className="text-base text-primary">Selengkapnya</Text>
@@ -134,7 +137,7 @@ const CardPaket = () => {
 
 const Berita = () => {
   return (
-    <View className="mr-4 ml-4 h-fit flex flex-col flex-wrap justify-center items-center pt-2 box-border pb-28">
+    <View className="mx-4 mt-4 h-fit flex flex-col flex-wrap justify-center items-center pt-2 box-border pb-28">
       <View className="w-full h-fit flex flex-row justify-between items-center mb-2">
         <Text className="text-base text-black">Berita Pilihan</Text>
         <Text className="text-base text-primary">Selengkapnya</Text>
@@ -164,6 +167,8 @@ const CardBerita = () => {
 };
 
 const BotNavBar = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
     <View className="w-full h-28 absolute bottom-0 flex items-center justify-center">
       <View className=" w-full h-3/5 flex flex-row p-2 px-8 items-center justify-between bg-white absolute bottom-0 rounded-t-2xl">
@@ -177,9 +182,13 @@ const BotNavBar = () => {
         </View>
       </View>
       <View className="w-20 h-20 bg-white absolute top-4 rounded-full box-border p-4 flex items-center justify-center">
-        <TouchableOpacity className="h-full w-full">
-          <View className="w-full h-full rounded-full border-2 flex items-center justify-center">
-            <Text className="text-4xl text-black">+</Text>
+        <TouchableOpacity
+          className="h-full w-full"
+          onPress={() => {
+            navigation.navigate('Detail');
+          }}>
+          <View className="w-full h-full rounded-full border-[1px] flex items-center justify-center">
+            <Text className="text-3xl text-black">+</Text>
           </View>
         </TouchableOpacity>
       </View>
