@@ -16,12 +16,12 @@ const Detail = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
-    <SafeAreaView className="px-6 flex flex-col w-full h-screen justify-start items-center box-border">
+    <SafeAreaView className="px-6 flex flex-col w-full h-screen justify-start items-center box-border bg-white">
       <View className="flex flex-row py-4 w-full h-fit items-center justify-between">
         <Text className="text-black text-xl font-bold">Detail Order</Text>
         <TouchableOpacity
           onPress={() => {
-            navigation.pop();
+            navigation.replace('Home');
           }}>
           <Image source={require('../../../icons/close.png')} />
         </TouchableOpacity>
@@ -72,7 +72,7 @@ const Alamat = () => {
   return (
     <View className="w-full flex mt-4">
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
-        <Text className="text-black text-base">Metode Order</Text>
+        <Text className="text-black text-base">Pakaian diambil dari</Text>
         <TouchableOpacity>
           <View className="flex flex-row items-center space-x-1">
             <View className="w-1 h-1 border-[1px] rounded-full"></View>
@@ -125,7 +125,7 @@ const Info = () => {
       <View className="w-6 h-fit bg-black rounded-full flex items-center justify-center">
         <Text className="text-white text-base font-bold">i</Text>
       </View>
-      <Text className="text-black text-sm -mt-1">
+      <Text className="text-black text-sm -mt-1 ">
         Harga di atas masih berupa harga perkiraan, Harga akhir akan ditampilkan
         setelah dilakukan penimbangan oleh mitra Strika.in
       </Text>

@@ -8,6 +8,8 @@
 /// <reference types="nativewind/types" />
 
 import React from 'react';
+// import {View} from 'react-native';
+// import Tes from './screens/Tes';
 import {NavigationContainer} from '@react-navigation/native';
 import Router from './Router';
 
@@ -16,6 +18,9 @@ function App(): JSX.Element {
     <NavigationContainer>
       <Router />
     </NavigationContainer>
+    // <View>
+    //   <Tes />
+    // </View>
   );
 }
 

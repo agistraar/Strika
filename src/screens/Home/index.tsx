@@ -7,15 +7,24 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Modal,
+  TextInput,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParams} from '../../Router';
+import {SelectList} from 'react-native-dropdown-select-list';
+
+type modalParams = {
+  visible: boolean;
+  set: Function;
+};
 
 const Home = () => {
   return (
-    <SafeAreaView className=" flex flex-col w-full h-screen justify-start items-center box-border">
+    <SafeAreaView className=" flex flex-col w-full h-screen justify-start items-center box-border bg-white">
       <ScrollView className=" h-full w-full box-border">
         <View className="flex p-4 pt-8 pb-6 items-center w-full border-b-[1px] border-gray-300 rounded-b-3xl">
           <Profile />
@@ -167,8 +176,7 @@ const CardBerita = () => {
 };
 
 const BotNavBar = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParams>>();
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <View className="w-full h-28 absolute bottom-0 flex items-center justify-center">
       <View className=" w-full h-3/5 flex flex-row p-2 px-8 items-center justify-between bg-white absolute bottom-0 rounded-t-2xl">
@@ -181,18 +189,144 @@ const BotNavBar = () => {
           <Image source={require('../../icons/user.png')} />
         </View>
       </View>
-      <View className="w-20 h-20 bg-white absolute top-4 rounded-full box-border p-4 flex items-center justify-center">
+      <View className="w-20 h-20 z-10 bg-white absolute top-4 rounded-full box-border p-4 flex items-center justify-center">
         <TouchableOpacity
           className="h-full w-full"
           onPress={() => {
-            navigation.navigate('Detail');
+            setModalVisible(true);
           }}>
           <View className="w-full h-full rounded-full border-[1px] flex items-center justify-center">
             <Text className="text-3xl text-black">+</Text>
           </View>
         </TouchableOpacity>
       </View>
+      <BottomModal visible={modalVisible} set={setModalVisible} />
     </View>
+  );
+};
+
+const BottomModal = ({visible, set}: modalParams) => {
+  const [berat, onChangeBerat] = useState('0');
+  const [selectedPaket, setSelectedPaket] = useState('');
+  const [selectedDurasi, setSelectedDurasi] = useState('');
+
+  const dataPaket = [
+    {key: '1', value: 'Paket Bronze'},
+    {key: '2', value: 'Paket Silver'},
+    {key: '3', value: 'Paket Gold'},
+  ];
+
+  const dataDurasi = [
+    {key: '1', value: 'Reguler'},
+    {key: '2', value: 'Kilat'},
+  ];
+
+  console.log(selectedPaket);
+  console.log(selectedDurasi);
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={() => {
+        set(false);
+      }}>
+      <View className="h-screen w-full bg-gray-100/50">
+        <TouchableWithoutFeedback
+          onPress={() => {
+            set(false);
+          }}>
+          <View className="h-full w-full"></View>
+        </TouchableWithoutFeedback>
+        <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-4 px-8 space-y-3 rounded-t-3xl">
+          <View className="w-full flex justify-start">
+            <Text className="text-lg text-black">Berat Pakaian</Text>
+          </View>
+          <View className="flex flex-row w-full h-12">
+            <TouchableOpacity
+              className="w-1/4"
+              onPress={() => {
+                let val = Number(berat) - 1;
+                onChangeBerat(val.toString());
+              }}>
+              <View className="w-full h-full bg-primary rounded-l-3xl flex justify-center items-center">
+                <Image source={require('../../icons/min.png')} />
+              </View>
+            </TouchableOpacity>
+            <View className="w-2/4 flex flex-row items-center">
+              <TextInput
+                className="w-3/4 text-right text-lg font-bold"
+                onChangeText={onChangeBerat}
+                value={berat}
+                keyboardType="numeric"
+              />
+              <Text className="w-1/4 text-lg text-black font-bold">Kg</Text>
+            </View>
+            <TouchableOpacity
+              className="w-1/4"
+              onPress={() => {
+                let val = Number(berat) + 1;
+                onChangeBerat(val.toString());
+              }}>
+              <View className="w-full h-full bg-primary rounded-r-3xl flex justify-center items-center">
+                <Image source={require('../../icons/addpng.png')} />
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View className="w-full flex flex-row mt-4 box-border items-start space-x-2">
+            <View className="w-6 h-fit bg-black rounded-full flex items-center justify-center">
+              <Text className="text-white text-base font-bold">i</Text>
+            </View>
+            <Text className="text-black text-sm -mt-1">
+              Berat pakaian akan ditimbang ulang oleh penyetrika untuk
+              memastikan berat asli pakaian
+            </Text>
+          </View>
+          <View className="w-full flex justify-start">
+            <Text className="text-lg text-black">Gunakan Paket</Text>
+          </View>
+          <SelectList
+            search={false}
+            dropdownTextStyles={{color: '#000000'}}
+            placeholder="Pilih Paket"
+            boxStyles={{borderRadius: 30, width: 320}}
+            dropdownStyles={{width: 320}}
+            setSelected={(val: React.SetStateAction<string>) =>
+              setSelectedPaket(val)
+            }
+            data={dataPaket}
+            save="value"
+          />
+          <View className="w-full flex justify-start">
+            <Text className="text-lg text-black">Durasi Pengerjaan</Text>
+          </View>
+          <SelectList
+            search={false}
+            dropdownTextStyles={{color: '#000000'}}
+            defaultOption={{key: '1', value: 'Reguler'}}
+            boxStyles={{borderRadius: 30, width: 320}}
+            dropdownStyles={{width: 320}}
+            setSelected={(val: React.SetStateAction<string>) =>
+              setSelectedDurasi(val)
+            }
+            data={dataDurasi}
+            save="value"
+          />
+          <TouchableOpacity
+            className="w-full bg-primary py-2 rounded-3xl"
+            onPress={() => {
+              navigation.replace('Detail');
+            }}>
+            <Text className="text-base font-bold text-white w-full text-center">
+              Tambah Order
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
   );
 };
 

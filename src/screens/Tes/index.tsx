@@ -1,42 +1,81 @@
 /* eslint-disable prettier/prettier */
-// import * as React from 'react';
-// import {Text, View, Button} from 'react-native';
-// import BottomSheet from 'reanimated-bottom-sheet';
+import React, {useState} from 'react';
+import {Alert, Modal, StyleSheet, Text, Pressable, View} from 'react-native';
 
-// export default function App() {
-//   const renderContent = () => (
-//     <View
-//       style={{
-//         backgroundColor: 'white',
-//         padding: 16,
-//         height: 450,
-//       }}>
-//       <Text>Swipe down to close</Text>
-//     </View>
-//   );
+const Tes = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  return (
+    <View style={styles.centeredView}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Hello World!</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => setModalVisible(!modalVisible)}>
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+      <Pressable
+        style={[styles.button, styles.buttonOpen]}
+        onPress={() => setModalVisible(true)}>
+        <Text style={styles.textStyle}>Show Modal</Text>
+      </Pressable>
+    </View>
+  );
+};
 
-//   const sheetRef = React.useRef(null);
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+});
 
-//   return (
-//     <>
-//       <View
-//         style={{
-//           flex: 1,
-//           backgroundColor: 'papayawhip',
-//           alignItems: 'center',
-//           justifyContent: 'center',
-//         }}>
-//         <Button
-//           title="Open Bottom Sheet"
-//           onPress={() => sheetRef.current.snapTo(0)}
-//         />
-//       </View>
-//       <BottomSheet
-//         ref={sheetRef}
-//         snapPoints={[450, 300, 0]}
-//         borderRadius={10}
-//         renderContent={renderContent}
-//       />
-//     </>
-//   );
-// }
+export default Tes;
