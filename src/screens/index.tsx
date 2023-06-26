@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
 import Home from './Home';
-import {Detail} from './Orders';
+import OrderRouter from './Orders/OrderRouter';
 
-export {Home, Detail};
+export {Home, OrderRouter};

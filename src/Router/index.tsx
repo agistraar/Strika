@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Home, Detail} from '../screens';
+import {Home} from '../screens';
+import OrderRouter from '../screens/Orders/OrderRouter';
 
 export type RootStackParams = {
   Home: any;
-  Detail: any;
+  OrderRouter: any;
 };
 
 const RootStack = createNativeStackNavigator();
@@ -19,8 +20,8 @@ const Router = () => {
         options={{headerShown: false}}
       />
       <RootStack.Screen
-        name="Detail"
-        component={Detail}
+        name="OrderRouter"
+        component={OrderRouter}
         options={{headerShown: false}}
       />
     </RootStack.Navigator>

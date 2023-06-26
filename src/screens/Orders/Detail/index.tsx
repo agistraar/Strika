@@ -10,6 +10,7 @@ import {
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {routeOrderParams} from '../OrderRouter';
 import {RootStackParams} from '../../../Router';
 
 const Detail = () => {
@@ -50,9 +51,9 @@ const Metode = () => {
         <Text className="text-black text-base">Metode Order</Text>
         <TouchableOpacity>
           <View className="flex flex-row items-center space-x-1">
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
           </View>
         </TouchableOpacity>
       </View>
@@ -75,13 +76,13 @@ const Alamat = () => {
         <Text className="text-black text-base">Pakaian diambil dari</Text>
         <TouchableOpacity>
           <View className="flex flex-row items-center space-x-1">
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
           </View>
         </TouchableOpacity>
       </View>
-      <View className="flex border-2 border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
+      <View className="flex border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
         <Text className="text-black text-base font-bold">Rumah</Text>
         <Text className="text-black text-base">
           Jl. Adi Sucipto, Gg. Fitrah, No. 356
@@ -134,8 +135,14 @@ const Info = () => {
 };
 
 const BtnKonfirmasi = () => {
+  const navigationOrder =
+    useNavigation<NativeStackNavigationProp<routeOrderParams>>();
   return (
-    <TouchableOpacity className="w-full mt-4">
+    <TouchableOpacity
+      className="w-full mt-4"
+      onPress={() => {
+        navigationOrder.push('Mitra');
+      }}>
       <View className="w-full rounded-3xl bg-primary flex justify-center items-center py-2">
         <Text className="text-white text-lg font-bold">Konfirmasi Order</Text>
       </View>
