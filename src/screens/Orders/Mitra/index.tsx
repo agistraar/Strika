@@ -7,33 +7,50 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  FlatList,
+  RefreshControl,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {routeOrderParams} from '../OrderRouter';
-import {useNavigation} from '@react-navigation/native';
+import {RootRouteProps, routeOrderParams} from '../OrderRouter';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import Data from './data.json';
 
 type menuParams = {
   judul: String;
 };
 
 type cardParams = {
-  pick: Function;
-  status: boolean;
+  nama: String;
+  foto: String;
+  alamat: String;
+  harga: number;
+  reguler: Number;
+  kilat: Number;
 };
 
 type modalParams = {
   visible: boolean;
   set: Function;
+  setParent: Function;
   reset: Function;
+  biaya: number;
 };
 
 const Mitra = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [cardStatus, setCardStatus] = useState(false);
+  const user = Data.mitra;
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   return (
     <SafeAreaView className="w-full h-full flex bg-white">
       <View className="w-full px-4 pt-6 pb-3 flex border-b-[1px] border-gray-300 space-y-2">
@@ -55,18 +72,23 @@ const Mitra = () => {
           </ScrollView>
         </View>
       </View>
-      <ScrollView
+      <FlatList
+        className="w-full px-5 py-2"
+        data={user}
         showsVerticalScrollIndicator={false}
-        className="w-full px-5 py-2">
-        <CardMitra pick={setModalVisible} status={cardStatus} />
-        <CardMitra pick={setModalVisible} status={cardStatus} />
-        <CardMitra pick={setModalVisible} status={cardStatus} />
-        <CardMitra pick={setModalVisible} status={cardStatus} />
-      </ScrollView>
-      <BottomModal
-        visible={modalVisible}
-        set={setModalVisible}
-        reset={setCardStatus}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        renderItem={({item}) => (
+          <CardMitra
+            nama={item.nama}
+            foto={item.foto}
+            alamat={item.alamat}
+            harga={item.harga}
+            reguler={item.reguler}
+            kilat={item.kilat}
+          />
+        )}
       />
     </SafeAreaView>
   );
@@ -81,11 +103,7 @@ const SortMenu = ({judul}: menuParams) => {
           isFocused ? 'bg-primary' : 'bg-white border-[1px] border-primary'
         } px-4 py-0.5 rounded-2xl`}
         onPress={() => {
-          if (isFocused) {
-            setIsFocused(false);
-          } else {
-            setIsFocused(true);
-          }
+          setIsFocused(!isFocused);
         }}>
         <Text
           className={`text-base ${isFocused ? 'text-white' : 'text-primary'} `}>
@@ -96,24 +114,22 @@ const SortMenu = ({judul}: menuParams) => {
   );
 };
 
-const CardMitra = ({pick, status}: cardParams) => {
-  const [isFocused, setIsFocused] = useState(status);
-  const setFocus = () => {
-    if (isFocused) {
-      setIsFocused(false);
-    } else {
-      setIsFocused(true);
-    }
-  };
+const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  });
   return (
     <TouchableOpacity
       onPress={() => {
-        setFocus();
-        pick(true);
+        setIsFocused(!isFocused);
+        setModalVisible(true);
       }}>
       <View
-        className={`w-full mb-4 border-[1px] border-gray-300 rounded-2xl ${
-          isFocused ? 'bg-primary' : 'bg-white'
+        className={`w-full mb-4 border-[1px] rounded-2xl ${
+          isFocused ? 'bg-primary border-white' : 'bg-white border-gray-300'
         }`}>
         <View
           className={`w-full flex items-start border-b-[1px] ${
@@ -122,12 +138,10 @@ const CardMitra = ({pick, status}: cardParams) => {
           <View className=" w-full flex flex-row justify-between ">
             <View className="flex flex-row items-center space-x-2 w-fit">
               <Image
-                source={require('../../../image/agis.png')}
+                source={{uri: `https://i.pravatar.cc/150?u=${foto}`}}
                 className="h-10 w-10 rounded-full"
               />
-              <Text className="text-base text-black font-bold">
-                Ibu Yoimiya
-              </Text>
+              <Text className="text-base text-black font-bold">{nama}</Text>
             </View>
             <View className="flex flex-row items-center">
               <Text className="text-sm text-black">4.3</Text>
@@ -137,23 +151,72 @@ const CardMitra = ({pick, status}: cardParams) => {
               />
             </View>
           </View>
-          <Text className="text-base text-black mt-2">
-            Jl. Adi Sucipto, Gg. Fitrah, No. 356
-          </Text>
+          <Text className="text-base text-black mt-2">{alamat}</Text>
         </View>
         <View className="w-full flex flex-row justify-between items-center p-2">
-          <Text className="text-lg text-black font-bold">1.300/Kg</Text>
+          <Text className="text-lg text-black font-bold">
+            {formatter.format(harga)}/Kg
+          </Text>
           <View>
-            <Text className="text-sm text-black">Reguler: 2 Hari</Text>
-            <Text className="text-sm text-black">Kilat: 4 Jam</Text>
+            <Text className="text-sm text-black">
+              Reguler: {String(reguler)} Hari
+            </Text>
+            <Text className="text-sm text-black">
+              Kilat: {String(kilat)} Jam
+            </Text>
           </View>
         </View>
       </View>
+      <BgModal
+        visible={modalVisible}
+        set={setModalVisible}
+        setParent={setModalVisible}
+        reset={setIsFocused}
+        biaya={harga}
+      />
     </TouchableOpacity>
   );
 };
 
-const BottomModal = ({visible, set, reset}: modalParams) => {
+const BgModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
+  const [menuVisible, setMenuVisible] = useState(false);
+  return (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={visible}
+      onShow={() => {
+        setMenuVisible(true);
+      }}
+      onRequestClose={() => {
+        set(false);
+        setParent(false);
+        reset(false);
+      }}>
+      <BottomModal
+        visible={menuVisible}
+        set={setMenuVisible}
+        setParent={setParent}
+        reset={reset}
+        biaya={biaya}
+      />
+      <View className="h-screen w-full bg-black/25 items-center justify-center -z-10" />
+    </Modal>
+  );
+};
+
+const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
+  const formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  });
+  const route = useRoute<RootRouteProps<'Mitra'>>();
+  const hargaTotal = biaya * parseInt(route.params.berat, 10);
+  // const kusut = route.params.kusut;
+  // const rapi = route.params.rapi;
+  const durasi = route.params.durasi;
+  const biayaDurasi = durasi === 'Kilat' ? 30000 : 0;
+
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
   return (
@@ -163,52 +226,55 @@ const BottomModal = ({visible, set, reset}: modalParams) => {
       visible={visible}
       onRequestClose={() => {
         set(false);
+        setParent(false);
         reset(false);
       }}>
-      <View className="h-screen w-full bg-black/25">
-        <TouchableWithoutFeedback
-          onPress={() => {
-            set(false);
-            reset(false);
-          }}>
-          <View className="h-full w-full"></View>
-        </TouchableWithoutFeedback>
-        <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-4 px-8 space-y-3 rounded-t-3xl">
-          <View className="w-full">
-            <View className="w-full flex border-[1px] border-gray-300 rounded-t-2xl px-4 py-2">
+      <TouchableWithoutFeedback
+        onPress={() => {
+          set(false);
+          setParent(false);
+          reset(false);
+        }}>
+        <View className="h-screen w-full -z-10" />
+      </TouchableWithoutFeedback>
+      <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-4 px-8 space-y-3 rounded-t-3xl">
+        <View className="w-full">
+          <View className="w-full flex border-[1px] border-gray-300 rounded-t-2xl px-4 py-2">
+            <Text className="text-base text-black">Harga</Text>
+          </View>
+          <View className="w-full flex border-x-[1px] border-gray-300 px-4 py-2 space-y-2">
+            <View className="w-full flex flex-row justify-between items-center">
               <Text className="text-base text-black">Harga</Text>
+              <Text className="text-base text-black">
+                {formatter.format(hargaTotal)}
+              </Text>
             </View>
-            <View className="w-full flex border-x-[1px] border-gray-300 px-4 py-2 space-y-2">
-              <View className="w-full flex flex-row justify-between items-center">
-                <Text className="text-base text-black">Harga Awal</Text>
-                <Text className="text-base text-black">40.000</Text>
-              </View>
-              <View className="w-full flex flex-row justify-between items-center">
-                <Text className="text-base text-black">Paket Gold</Text>
-                <Text className="text-base text-black">-10.000</Text>
-              </View>
-              <View className="w-full flex flex-row justify-between items-center">
-                <Text className="text-base text-black">Durasi Kilat</Text>
-                <Text className="text-base text-black">30.000</Text>
-              </View>
-            </View>
-            <View className="w-full flex border-[1px] border-gray-300 rounded-b-2xl px-4 py-2">
-              <View className="w-full flex flex-row items-center justify-between">
-                <Text className="text-base text-black font-bold">Total</Text>
-                <Text className="text-base text-black font-bold">60.000</Text>
-              </View>
+            <View className="w-full flex flex-row justify-between items-center">
+              <Text className="text-base text-black">Durasi Kilat</Text>
+              <Text className="text-base text-black">
+                {formatter.format(biayaDurasi)}
+              </Text>
             </View>
           </View>
-          <TouchableOpacity
-            className="w-full bg-primary py-2 rounded-3xl"
-            onPress={() => {
-              navigationOrder.push('OrderInfo');
-            }}>
-            <Text className="text-base font-bold text-white w-full text-center">
-              Konfirmasi Mitra
-            </Text>
-          </TouchableOpacity>
+          <View className="w-full flex border-[1px] border-gray-300 rounded-b-2xl px-4 py-2">
+            <View className="w-full flex flex-row items-center justify-between">
+              <Text className="text-base text-black font-bold">Total</Text>
+              <Text className="text-base text-black font-bold">
+                {formatter.format(hargaTotal + biayaDurasi)}
+              </Text>
+            </View>
+          </View>
         </View>
+        <TouchableOpacity
+          className="w-full bg-primary py-2 rounded-3xl"
+          onPress={() => {
+            reset(false);
+            navigationOrder.push('OrderInfo');
+          }}>
+          <Text className="text-base font-bold text-white w-full text-center">
+            Konfirmasi Mitra
+          </Text>
+        </TouchableOpacity>
       </View>
     </Modal>
   );

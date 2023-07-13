@@ -12,11 +12,14 @@ import React from 'react';
 // import Tes from './screens/Tes';
 import {NavigationContainer} from '@react-navigation/native';
 import Router from './Router';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 function App(): JSX.Element {
   return (
     <NavigationContainer>
-      <Router />
+      <GestureHandlerRootView style={{flex: 1}}>
+        <Router />
+      </GestureHandlerRootView>
     </NavigationContainer>
     // <View>
     //   <Tes />

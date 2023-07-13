@@ -4,12 +4,16 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Detail from '../Detail';
 import Mitra from '../Mitra';
 import OrderInfo from '../OrderInfo';
+import {RouteProp} from '@react-navigation/native';
 
 export type routeOrderParams = {
-  Detail: any;
-  Mitra: any;
+  Detail: {berat: string; kusut: string; rapi: string; durasi: string};
+  Mitra: {berat: string; kusut: string; rapi: string; durasi: string};
   OrderInfo: any;
 };
+
+export type RootRouteProps<RouteName extends keyof routeOrderParams> =
+  RouteProp<routeOrderParams, RouteName>;
 const StackOrder = createNativeStackNavigator();
 
 const OrderRouter = () => {
