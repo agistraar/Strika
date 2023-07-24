@@ -15,7 +15,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
 import {useNavigation, useRoute} from '@react-navigation/native';
-import Data from './data.json';
+import Data from '../../../data/data.json';
 
 type menuParams = {
   judul: string;
@@ -237,7 +237,7 @@ const BottomModal = ({
   const harga = biaya * berat;
   const durasi = route.params.durasi;
   const kelipatanDurasi =
-    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
+    durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
   const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
 
   const navigationOrder =
@@ -267,7 +267,12 @@ const BottomModal = ({
           </View>
           <View className="w-full flex border-x-[1px] border-gray-300 px-4 py-2 space-y-2">
             <View className="w-full flex flex-row justify-between items-center">
-              <Text className="text-base text-black">Harga</Text>
+              <View>
+                <Text className="text-black text-base">Harga Awal</Text>
+                <Text className="text-black text-xs">
+                  {'(Rata-rata Harga x berat)'}
+                </Text>
+              </View>
               <Text className="text-base text-black">
                 {formatter.format(harga)}
               </Text>
@@ -277,7 +282,10 @@ const BottomModal = ({
               <Text className="text-base text-black">{kelipatanDurasi}</Text>
             </View>
             <View className="w-full flex flex-row justify-between items-center">
-              <Text className="text-base text-black">Biaya Aplikasi</Text>
+              <View>
+                <Text className="text-black text-base">Biaya Aplikasi</Text>
+                <Text className="text-black text-xs">{'(Rp. 1.300/Kg)'}</Text>
+              </View>
               <Text className="text-base text-black">
                 {formatter.format(1300 * berat)}
               </Text>

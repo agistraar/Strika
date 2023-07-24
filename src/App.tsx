@@ -36,7 +36,7 @@ const Splash = () => {
   return (
     <View className="w-full h-full flex justify-center items-center bg-white">
       <Lottie
-        source={require('./splash.json')}
+        source={require('./data/splash.json')}
         autoPlay
         loop={true}
         resizeMode="cover"

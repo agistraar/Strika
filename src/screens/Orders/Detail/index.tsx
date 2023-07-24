@@ -100,9 +100,9 @@ const Alamat = () => {
         <Text className="text-black text-base">Pakaian diambil dari</Text>
         <TouchableOpacity>
           <View className="flex flex-row items-center space-x-1">
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
           </View>
         </TouchableOpacity>
       </View>
@@ -123,7 +123,7 @@ const Harga = ({harga, durasi, berat}: hargaParams) => {
   });
 
   const kelipatanDurasi =
-    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
+    durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
   const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
 
   return (
@@ -133,7 +133,12 @@ const Harga = ({harga, durasi, berat}: hargaParams) => {
       </View>
       <View className="flex border-[1px] border-gray-300 px-3 py-2 border-t-0 space-y-2">
         <View className="w-full flex flex-row items-center justify-between">
-          <Text className="text-black text-base">Harga Awal</Text>
+          <View>
+            <Text className="text-black text-base">Harga Awal</Text>
+            <Text className="text-black text-xs">
+              {'(Rata-rata Harga x berat)'}
+            </Text>
+          </View>
           <Text className="text-black text-base">
             {formatter.format(harga)}
           </Text>
@@ -143,14 +148,19 @@ const Harga = ({harga, durasi, berat}: hargaParams) => {
           <Text className="text-black text-base">{kelipatanDurasi}</Text>
         </View>
         <View className="w-full flex flex-row items-center justify-between">
-          <Text className="text-black text-base">Biaya Aplikasi</Text>
+          <View>
+            <Text className="text-black text-base">Biaya Aplikasi</Text>
+            <Text className="text-black text-xs">{'(Rp. 1.300/kg)'}</Text>
+          </View>
           <Text className="text-black text-base">
             {formatter.format(1300 * berat)}
           </Text>
         </View>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
-        <Text className="text-black text-base font-bold">Total</Text>
+        <Text className="text-black text-base font-bold">
+          Total Harga Perkiraan
+        </Text>
         <Text className="text-black text-base font-bold">
           {formatter.format(totalHarga + 1300 * berat)}
         </Text>

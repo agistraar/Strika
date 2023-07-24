@@ -42,7 +42,11 @@ const SplashScreen = () => {
         </Text>
       </View>
       <View className="w-3/4 h-16 absolute top-2/3">
-        <Lottie source={require('./loading.json')} autoPlay loop={true} />
+        <Lottie
+          source={require('../../../data/loading.json')}
+          autoPlay
+          loop={true}
+        />
       </View>
     </View>
   );
