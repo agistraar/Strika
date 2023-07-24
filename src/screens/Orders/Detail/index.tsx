@@ -16,6 +16,7 @@ import {RootStackParams} from '../../../Router';
 type hargaParams = {
   harga: number;
   durasi: String;
+  berat: number;
 };
 
 type metodeParams = {
@@ -24,7 +25,7 @@ type metodeParams = {
 };
 
 type confirParams = {
-  berat: string;
+  berat: number;
   kusut: string;
   rapi: string;
   durasi: string;
@@ -32,10 +33,11 @@ type confirParams = {
 
 const Detail = () => {
   const route = useRoute<RootRouteProps<'Detail'>>();
-  const totalHarga = parseInt(route.params.berat, 10) * 1100;
+  const totalHarga = route.params.berat * 6000;
   const kusut = route.params.kusut;
   const rapi = route.params.rapi;
   const durasi = route.params.durasi;
+  const berat = route.params.berat;
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
@@ -57,10 +59,10 @@ const Detail = () => {
         <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl mt-4">
           <Text className="text-black text-base">Berat Pakaian</Text>
           <Text className="text-black text-base font-bold">
-            {route.params.berat}Kg
+            {berat.toString().replace('.', ',')}Kg
           </Text>
         </View>
-        <Harga harga={totalHarga} durasi={durasi} />
+        <Harga harga={totalHarga} durasi={durasi} berat={berat} />
         <Info />
         <BtnKonfirmasi
           berat={route.params.berat}
@@ -80,11 +82,11 @@ const Metode = ({kusut, rapi}: metodeParams) => {
         <Text className="text-black text-base">Metode Order</Text>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0">
-        <Text className="text-black text-base">Pakaian Kusut</Text>
+        <Text className="text-black text-base">Transportasi Pakaian Kusut</Text>
         <Text className="text-black text-base font-bold">{kusut}</Text>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
-        <Text className="text-black text-base">Pakaian Rapi</Text>
+        <Text className="text-black text-base">Transportasi Pakaian Rapi</Text>
         <Text className="text-black text-base font-bold">{rapi}</Text>
       </View>
     </View>
@@ -114,13 +116,15 @@ const Alamat = () => {
   );
 };
 
-const Harga = ({harga, durasi}: hargaParams) => {
+const Harga = ({harga, durasi, berat}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
   });
 
-  const biayaDurasi = durasi === 'Kilat' ? 30000 : 0;
+  const kelipatanDurasi =
+    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
+  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
 
   return (
     <View className="w-full flex mt-4">
@@ -136,15 +140,19 @@ const Harga = ({harga, durasi}: hargaParams) => {
         </View>
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-black text-base">Durasi {durasi}</Text>
+          <Text className="text-black text-base">{kelipatanDurasi}</Text>
+        </View>
+        <View className="w-full flex flex-row items-center justify-between">
+          <Text className="text-black text-base">Biaya Aplikasi</Text>
           <Text className="text-black text-base">
-            {formatter.format(biayaDurasi)}
+            {formatter.format(1300 * berat)}
           </Text>
         </View>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
         <Text className="text-black text-base font-bold">Total</Text>
         <Text className="text-black text-base font-bold">
-          {formatter.format(harga + biayaDurasi)}
+          {formatter.format(totalHarga + 1300 * berat)}
         </Text>
       </View>
     </View>
@@ -154,10 +162,10 @@ const Harga = ({harga, durasi}: hargaParams) => {
 const Info = () => {
   return (
     <View className="w-full flex flex-row mt-4 box-border items-start space-x-2">
-      <View className="w-6 h-fit bg-black rounded-full flex items-center justify-center">
-        <Text className="text-white text-base font-bold">i</Text>
+      <View className="w-5 h-5 bg-black rounded-full flex items-center justify-center">
+        <Text className="text-white text-sm font-bold">i</Text>
       </View>
-      <Text className="text-black text-sm -mt-1 ">
+      <Text className="text-black text-sm -mt-1">
         Harga di atas merupakan harga perkiraan berdasarkan rata-rata harga dari
         mitra, Harga akhir akan ditampilkan setelah dilakukan penimbangan oleh
         mitra Strika.in

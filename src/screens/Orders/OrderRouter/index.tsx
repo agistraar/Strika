@@ -4,12 +4,42 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Detail from '../Detail';
 import Mitra from '../Mitra';
 import OrderInfo from '../OrderInfo';
+import Ulasan from '../Ulasan';
+import Review from '../Review';
 import {RouteProp} from '@react-navigation/native';
 
 export type routeOrderParams = {
-  Detail: {berat: string; kusut: string; rapi: string; durasi: string};
-  Mitra: {berat: string; kusut: string; rapi: string; durasi: string};
-  OrderInfo: any;
+  Detail: {berat: number; kusut: string; rapi: string; durasi: string};
+  Mitra: {berat: number; kusut: string; rapi: string; durasi: string};
+  OrderInfo: {
+    berat: number;
+    kusut: string;
+    rapi: string;
+    durasi: string;
+    harga: string;
+    foto: string;
+    nama: string;
+  };
+  Ulasan: {
+    berat: number;
+    kusut: string;
+    rapi: string;
+    durasi: string;
+    harga: string;
+    foto: string;
+    nama: string;
+  };
+  Review: {
+    berat: number;
+    kusut: string;
+    rapi: string;
+    durasi: string;
+    harga: string;
+    foto: string;
+    nama: string;
+    rating: number;
+    komentar: string;
+  };
 };
 
 export type RootRouteProps<RouteName extends keyof routeOrderParams> =
@@ -32,6 +62,16 @@ const OrderRouter = () => {
       <StackOrder.Screen
         name="OrderInfo"
         component={OrderInfo}
+        options={{headerShown: false}}
+      />
+      <StackOrder.Screen
+        name="Ulasan"
+        component={Ulasan}
+        options={{headerShown: false}}
+      />
+      <StackOrder.Screen
+        name="Review"
+        component={Review}
         options={{headerShown: false}}
       />
     </StackOrder.Navigator>

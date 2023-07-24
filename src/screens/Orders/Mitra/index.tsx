@@ -18,13 +18,13 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 import Data from './data.json';
 
 type menuParams = {
-  judul: String;
+  judul: string;
 };
 
 type cardParams = {
-  nama: String;
-  foto: String;
-  alamat: String;
+  nama: string;
+  foto: string;
+  alamat: string;
   harga: number;
   reguler: Number;
   kilat: Number;
@@ -36,6 +36,8 @@ type modalParams = {
   setParent: Function;
   reset: Function;
   biaya: number;
+  foto: string;
+  nama: string;
 };
 
 const Mitra = () => {
@@ -54,7 +56,7 @@ const Mitra = () => {
   return (
     <SafeAreaView className="w-full h-full flex bg-white">
       <View className="w-full px-4 pt-6 pb-3 flex border-b-[1px] border-gray-300 space-y-2">
-        <View className="flex flex-row items-center space-x-4">
+        <View className="flex flex-row items-center space-x-4 mb-2">
           <TouchableOpacity
             onPress={() => {
               navigationOrder.pop();
@@ -134,7 +136,7 @@ const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
         <View
           className={`w-full flex items-start border-b-[1px] ${
             isFocused ? 'border-white' : 'border-gray-300'
-          } p-2 `}>
+          } p-2 px-4 `}>
           <View className=" w-full flex flex-row justify-between ">
             <View className="flex flex-row items-center space-x-2 w-fit">
               <Image
@@ -153,7 +155,7 @@ const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
           </View>
           <Text className="text-base text-black mt-2">{alamat}</Text>
         </View>
-        <View className="w-full flex flex-row justify-between items-center p-2">
+        <View className="w-full flex flex-row justify-between items-center p-2 px-4">
           <Text className="text-lg text-black font-bold">
             {formatter.format(harga)}/Kg
           </Text>
@@ -173,12 +175,22 @@ const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
         setParent={setModalVisible}
         reset={setIsFocused}
         biaya={harga}
+        foto={foto}
+        nama={nama}
       />
     </TouchableOpacity>
   );
 };
 
-const BgModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
+const BgModal = ({
+  visible,
+  set,
+  setParent,
+  reset,
+  biaya,
+  foto,
+  nama,
+}: modalParams) => {
   const [menuVisible, setMenuVisible] = useState(false);
   return (
     <Modal
@@ -199,23 +211,34 @@ const BgModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
         setParent={setParent}
         reset={reset}
         biaya={biaya}
+        foto={foto}
+        nama={nama}
       />
       <View className="h-screen w-full bg-black/25 items-center justify-center -z-10" />
     </Modal>
   );
 };
 
-const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
+const BottomModal = ({
+  visible,
+  set,
+  setParent,
+  reset,
+  biaya,
+  foto,
+  nama,
+}: modalParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
   });
   const route = useRoute<RootRouteProps<'Mitra'>>();
-  const hargaTotal = biaya * parseInt(route.params.berat, 10);
-  // const kusut = route.params.kusut;
-  // const rapi = route.params.rapi;
+  const berat = route.params.berat;
+  const harga = biaya * berat;
   const durasi = route.params.durasi;
-  const biayaDurasi = durasi === 'Kilat' ? 30000 : 0;
+  const kelipatanDurasi =
+    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
+  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
 
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
@@ -237,7 +260,7 @@ const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
         }}>
         <View className="h-screen w-full -z-10" />
       </TouchableWithoutFeedback>
-      <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-4 px-8 space-y-3 rounded-t-3xl">
+      <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-8 px-8 space-y-3 rounded-t-3xl">
         <View className="w-full">
           <View className="w-full flex border-[1px] border-gray-300 rounded-t-2xl px-4 py-2">
             <Text className="text-base text-black">Harga</Text>
@@ -246,13 +269,17 @@ const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
             <View className="w-full flex flex-row justify-between items-center">
               <Text className="text-base text-black">Harga</Text>
               <Text className="text-base text-black">
-                {formatter.format(hargaTotal)}
+                {formatter.format(harga)}
               </Text>
             </View>
             <View className="w-full flex flex-row justify-between items-center">
-              <Text className="text-base text-black">Durasi Kilat</Text>
+              <Text className="text-base text-black">Durasi {durasi}</Text>
+              <Text className="text-base text-black">{kelipatanDurasi}</Text>
+            </View>
+            <View className="w-full flex flex-row justify-between items-center">
+              <Text className="text-base text-black">Biaya Aplikasi</Text>
               <Text className="text-base text-black">
-                {formatter.format(biayaDurasi)}
+                {formatter.format(1300 * berat)}
               </Text>
             </View>
           </View>
@@ -260,7 +287,7 @@ const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
             <View className="w-full flex flex-row items-center justify-between">
               <Text className="text-base text-black font-bold">Total</Text>
               <Text className="text-base text-black font-bold">
-                {formatter.format(hargaTotal + biayaDurasi)}
+                {formatter.format(totalHarga + 1300 * berat)}
               </Text>
             </View>
           </View>
@@ -268,8 +295,18 @@ const BottomModal = ({visible, set, setParent, reset, biaya}: modalParams) => {
         <TouchableOpacity
           className="w-full bg-primary py-2 rounded-3xl"
           onPress={() => {
+            set(false);
+            setParent(false);
             reset(false);
-            navigationOrder.push('OrderInfo');
+            navigationOrder.push('OrderInfo', {
+              berat: berat,
+              harga: String(biaya),
+              foto: foto,
+              nama: nama,
+              durasi: durasi,
+              rapi: route.params.rapi,
+              kusut: route.params.kusut,
+            });
           }}>
           <Text className="text-base font-bold text-white w-full text-center">
             Konfirmasi Mitra

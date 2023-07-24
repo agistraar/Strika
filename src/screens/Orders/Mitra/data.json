@@ -5,7 +5,7 @@
       "nama": "Ibu Yoimiya",
       "foto": "yoimiya@gmail.com",
       "alamat": "Jl. Letkol Sutoyo Gg. Indah No.13",
-      "harga": 1200,
+      "harga": 6000,
       "reguler": 2,
       "kilat": 4
     },
@@ -14,7 +14,7 @@
       "nama": "Ibu Ayaka",
       "foto": "ayaka@gmail.com",
       "alamat": "Jl. Imam Bonjol Gg. Busri No.8",
-      "harga": 1300,
+      "harga": 6500,
       "reguler": 1.5,
       "kilat": 3
     },
@@ -23,7 +23,7 @@
       "nama": "Kamisato Laundry",
       "foto": "kamisato@gmail.com",
       "alamat": "Jl. Gusti Hamzah No.356",
-      "harga": 1100,
+      "harga": 5500,
       "reguler": 3,
       "kilat": 6
     },
@@ -32,7 +32,7 @@
       "nama": "Ibu Ei",
       "foto": "raidenei@gmail.com",
       "alamat": "Jl. Gatot Subroto No.240",
-      "harga": 1200,
+      "harga": 6000,
       "reguler": 2,
       "kilat": 4
     },
@@ -41,7 +41,7 @@
       "nama": "Watatsumi Laundry",
       "foto": "watatsumi@gmail.com",
       "alamat": "Jl. Diponegoro Gg. Siliwangi No.24",
-      "harga": 1000,
+      "harga": 5000,
       "reguler": 3.5,
       "kilat": 7
     },
@@ -50,7 +50,7 @@
       "nama": "Sakura Laundry",
       "foto": "sakura@gmail.com",
       "alamat": "Jl. Ngurah Rai No.135",
-      "harga": 1400,
+      "harga": 7000,
       "reguler": 1,
       "kilat": 2
     },
@@ -59,7 +59,7 @@
       "nama": "Ibu Makoto",
       "foto": "makoto@gmail.com",
       "alamat": "Jl. Ngurah Rai Gg. Perjuangan No.13",
-      "harga": 1100,
+      "harga": 5500,
       "reguler": 3,
       "kilat": 6
     },
@@ -68,7 +68,7 @@
       "nama": "Shinobu Laundry",
       "foto": "shinobu@gmail.com",
       "alamat": "Jl. Uray Bawadi Gg. Pertiwi No.3",
-      "harga": 1300,
+      "harga": 6500,
       "reguler": 1.5,
       "kilat": 3
     },
@@ -77,7 +77,7 @@
       "nama": "Ibu Yae",
       "foto": "yaesakura@gmail.com",
       "alamat": "Jl. Ahmad Yani Gg. Perintis No.27",
-      "harga": 1400,
+      "harga": 7000,
       "reguler": 1,
       "kilat": 2
     },
@@ -86,7 +86,7 @@
       "nama": "Ibu Eula",
       "foto": "eula@gmail.com",
       "alamat": "Jl. Pangsuma No.82",
-      "harga": 1000,
+      "harga": 5000,
       "reguler": 3.5,
       "kilat": 7
     },
@@ -95,7 +95,7 @@
       "nama": "Ibu Ganyu",
       "foto": "ganyu@gmail.com",
       "alamat": "Jl. Oevang Oeray No.234",
-      "harga": 1300,
+      "harga": 6500,
       "reguler": 1.5,
       "kilat": 3
     },
@@ -104,7 +104,7 @@
       "nama": "Ibu Sushang",
       "foto": "sushang@gmail.com",
       "alamat": "Jl. Pattimura Gg. Barisan No.32",
-      "harga": 1300,
+      "harga": 6500,
       "reguler": 1.5,
       "kilat": 3
     }

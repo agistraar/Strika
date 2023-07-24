@@ -24,6 +24,10 @@ type modalParams = {
   setParent: Function;
 };
 
+type cardParams = {
+  jenis: string;
+};
+
 const Home = () => {
   return (
     <SafeAreaView className=" flex flex-col w-full h-screen justify-start items-center box-border bg-white">
@@ -39,6 +43,7 @@ const Home = () => {
         <Berita />
       </ScrollView>
       <BotNavBar />
+      <Toast position="top" topOffset={20} />
     </SafeAreaView>
   );
 };
@@ -57,7 +62,15 @@ const Profile = () => {
           </Text>
           <Text className="text-xl text-black font-bold">Tsaritsa</Text>
         </View>
-        <Image className="h-6 w-6" source={require('../../icons/notif.png')} />
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
+          <Image
+            className="h-6 w-6"
+            source={require('../../icons/notif.png')}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -65,7 +78,7 @@ const Profile = () => {
 
 const CardMember = () => {
   return (
-    <View className="bg-primary flex p-3 space-y-2 rounded-3xl w-2/3">
+    <View className="bg-primary flex p-3 space-y-2 rounded-3xl w-11/12">
       <View className="flex flex-row justify-between space-x-8 h-fit w-fit">
         <Text className="text-base text-white">Sisa Kuota</Text>
         <Image className="w-6 h-6" source={require('../../icons/member.png')} />
@@ -107,10 +120,15 @@ const InfoSetrika = () => {
                 />
               </View>
             </View>
-            <Image
-              className="w-8 h-8"
-              source={require('../../icons/chat.png')}
-            />
+            <TouchableOpacity
+              onPress={() => {
+                fiturToast();
+              }}>
+              <Image
+                className="w-8 h-8"
+                source={require('../../icons/chat.png')}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -123,25 +141,54 @@ const Paket = () => {
     <View className="mx-4 mt-4 h-fit flex flex-col flex-wrap space-y-2 justify-center items-center pt-2 box-border">
       <View className="w-full h-fit flex flex-row justify-between items-center">
         <Text className="text-base text-black">Paket Rekomendasi</Text>
-        <Text className="text-base text-primary">Selengkapnya</Text>
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
+          <Text className="text-base text-primary">Selengkapnya</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-        <CardPaket />
-        <CardPaket />
-        <CardPaket />
+        <CardPaket jenis="Gold" />
+        <CardPaket jenis="Silver" />
+        <CardPaket jenis="Bronze" />
       </ScrollView>
     </View>
   );
 };
 
-const CardPaket = () => {
+const CardPaket = ({jenis}: cardParams) => {
+  let jumlah;
+  let warna;
+  let harga = 0;
+  const formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+  });
+  if (jenis === 'Gold') {
+    jumlah = '60';
+    warna = 'bg-gold';
+    harga = 80000;
+  } else if (jenis === 'Silver') {
+    jumlah = '30';
+    warna = 'bg-silver';
+    harga = 55000;
+  } else if (jenis === 'Bronze') {
+    jumlah = '10';
+    warna = 'bg-bronze';
+    harga = 35000;
+  }
   return (
     <View className="w-fit h-fit flex flex-row p-2 space-x-6 border-[1px] border-gray-300 rounded-2xl mr-3">
       <View className="flex h-fit flex-col space-y-3">
-        <Text className="text-base text-black">Paket Gold 15kg</Text>
-        <Text className="text-base text-black font-bold">45.000</Text>
+        <Text className="text-base text-black">
+          Paket {jenis} {jumlah}kg
+        </Text>
+        <Text className="text-base text-black font-bold">
+          {formatter.format(harga)}
+        </Text>
       </View>
-      <View className="w-14 h-14 bg-yellow-400 rounded-xl" />
+      <View className={`w-14 h-14 ${warna} rounded-xl`} />
     </View>
   );
 };
@@ -151,7 +198,12 @@ const Berita = () => {
     <View className="mx-4 mt-4 h-fit flex flex-col flex-wrap justify-center items-center pt-2 box-border pb-28">
       <View className="w-full h-fit flex flex-row justify-between items-center mb-2">
         <Text className="text-base text-black">Berita Pilihan</Text>
-        <Text className="text-base text-primary">Selengkapnya</Text>
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
+          <Text className="text-base text-primary">Selengkapnya</Text>
+        </TouchableOpacity>
       </View>
       <CardBerita />
       <CardBerita />
@@ -180,18 +232,31 @@ const CardBerita = () => {
 const BotNavBar = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
-    <View className="w-full h-28 absolute bottom-0 flex items-center justify-center">
-      <View className=" w-full h-3/5 flex flex-row p-2 px-8 items-center justify-between bg-white absolute bottom-0 rounded-t-2xl">
-        <View className=" h-fit w-1/3 flex flex-row items-center justify-between pr-2">
-          <Image source={require('../../icons/home.png')} />
+    <View className=" w-full h-16 flex flex-row p-2 px-8 items-center justify-between bg-white absolute bottom-0 rounded-t-2xl">
+      <View className=" h-fit w-1/3 flex flex-row items-center justify-between pr-2">
+        <Image source={require('../../icons/home.png')} />
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
           <Image source={require('../../icons/order.png')} />
-        </View>
-        <View className=" h-fit w-1/3 flex flex-row items-center justify-between pl-2">
-          <Image source={require('../../icons/box.png')} />
-          <Image source={require('../../icons/user.png')} />
-        </View>
+        </TouchableOpacity>
       </View>
-      <View className="w-20 h-20 z-10 bg-white absolute top-4 rounded-full box-border p-4 flex items-center justify-center">
+      <View className=" h-fit w-1/3 flex flex-row items-center justify-between pl-2">
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
+          <Image source={require('../../icons/box.png')} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            fiturToast();
+          }}>
+          <Image source={require('../../icons/user.png')} />
+        </TouchableOpacity>
+      </View>
+      <View className="w-20 h-20 z-10 bg-white absolute -top-7 right-1/2 left-1/2 rounded-full box-border p-4 flex items-center justify-center">
         <TouchableOpacity
           className="h-full w-full"
           onPress={() => {
@@ -244,13 +309,13 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
   const [selectedDurasi, setSelectedDurasi] = useState('');
 
   const [dataKotor, setDataKotor] = useState([
-    {label: 'Diantar', value: 'Diantar'},
-    {label: 'Diambil', value: 'Diambil'},
+    {label: 'Diantar Pelanggan', value: 'Diantar'},
+    {label: 'Diambil Mitra', value: 'Diambil'},
   ]);
 
   const [dataBersih, setDataBersih] = useState([
-    {label: 'Diantar', value: 'Diantar'},
-    {label: 'Diambil', value: 'Diambil'},
+    {label: 'Diantar Mitra', value: 'Diantar'},
+    {label: 'Diambil Pelanggan', value: 'Diambil'},
   ]);
 
   const [dataDurasi, setDataDurasi] = useState([
@@ -263,7 +328,8 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
       berat === '0' ||
       selectedKusut === '' ||
       selectedRapi === '' ||
-      selectedDurasi === ''
+      selectedDurasi === '' ||
+      berat === ''
     ) {
       return false;
     } else {
@@ -289,7 +355,7 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
         }}>
         <View className="h-screen w-full -z-10" />
       </TouchableWithoutFeedback>
-      <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-4 px-8 space-y-3 rounded-t-3xl">
+      <View className="flex justify-center items-center absolute bottom-0 bg-white w-full h-fit py-6 px-6 space-y-3 rounded-t-3xl">
         <View className="w-full flex justify-start">
           <Text className="text-lg text-black">Berat Pakaian</Text>
         </View>
@@ -297,9 +363,9 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           <TouchableOpacity
             className="w-1/5"
             onPress={() => {
-              if (Number(berat) > 0) {
-                let val = Number(berat) - 1;
-                onChangeBerat(val.toString());
+              if (Number(berat.replace(',', '.')) > 0) {
+                let val = Number(berat.replace(',', '.')) - 1;
+                onChangeBerat(val.toString().replace('.', ','));
               }
             }}>
             <View className="w-full h-full bg-primary rounded-l-3xl flex justify-center items-center">
@@ -318,8 +384,8 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           <TouchableOpacity
             className="w-1/5"
             onPress={() => {
-              let val = Number(berat) + 1;
-              onChangeBerat(val.toString());
+              let val = Number(berat.replace(',', '.')) + 1;
+              onChangeBerat(val.toString().replace('.', ','));
             }}>
             <View className="w-full h-full bg-primary rounded-r-3xl flex justify-center items-center">
               <Image source={require('../../icons/addpng.png')} />
@@ -336,7 +402,9 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           </Text>
         </View>
         <View className="w-full flex justify-start">
-          <Text className="text-lg text-black">Pakaian Kusut</Text>
+          <Text className="text-lg text-black">
+            Metode Transportasi Pakaian Kusut
+          </Text>
         </View>
         <DropDownPicker
           open={openKusut}
@@ -345,7 +413,7 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           setOpen={setOpenKusut}
           setValue={setSelectedKusut}
           setItems={setDataKotor}
-          placeholder="Pilih Metode Transportasi Pakaian"
+          placeholder="Pilih Metode"
           dropDownDirection="BOTTOM"
           style={{
             borderRadius: 30,
@@ -359,7 +427,9 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           }}
         />
         <View className="w-full flex justify-start">
-          <Text className="text-lg text-black">Pakaian Rapi</Text>
+          <Text className="text-lg text-black">
+            Metode Transportasi Pakaian Rapi
+          </Text>
         </View>
         <DropDownPicker
           open={openRapi}
@@ -368,7 +438,7 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
           setOpen={setOpenRapi}
           setValue={setSelectedRapi}
           setItems={setDataBersih}
-          placeholder="Pilih Metode Transportasi Pakaian"
+          placeholder="Pilih Metode"
           dropDownDirection="BOTTOM"
           style={{
             borderRadius: 30,
@@ -408,7 +478,7 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
               navigation.navigate('OrderRouter', {
                 screen: 'Detail',
                 params: {
-                  berat: berat,
+                  berat: parseFloat(berat.replace(',', '.')),
                   kusut: selectedKusut,
                   rapi: selectedRapi,
                   durasi: selectedDurasi,
@@ -435,6 +505,16 @@ const orderToast = () => {
     type: 'error',
     text1: 'Data Order Belum Lengkap',
     text2: 'Mohon Lengkapi Data Order',
+    autoHide: true,
+    visibilityTime: 3000,
+  });
+};
+
+const fiturToast = () => {
+  Toast.show({
+    type: 'info',
+    text1: 'Fitur Belum Tersedia',
+    text2: 'Mohon maaf, fitur dalam tahap pengembangan',
     autoHide: true,
     visibilityTime: 3000,
   });
