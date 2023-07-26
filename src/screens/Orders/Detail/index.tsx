@@ -120,6 +120,7 @@ const Harga = ({harga, durasi, berat}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
 
   const kelipatanDurasi =

@@ -19,7 +19,7 @@ function App(): JSX.Element {
   const [splash, setSplash] = useState(true);
   setTimeout(() => {
     setSplash(false);
-  }, 4800);
+  }, 4000);
   return (
     <NavigationContainer>
       <GestureHandlerRootView className="flex-1 w-full h-full">

@@ -22,12 +22,14 @@ type menuParams = {
 };
 
 type cardParams = {
+  id: number;
   nama: string;
   foto: string;
   alamat: string;
   harga: number;
-  reguler: Number;
-  kilat: Number;
+  reguler: number;
+  kilat: number;
+  jumBerat: number;
 };
 
 type modalParams = {
@@ -83,12 +85,14 @@ const Mitra = () => {
         }
         renderItem={({item}) => (
           <CardMitra
+            id={item.id}
             nama={item.nama}
             foto={item.foto}
             alamat={item.alamat}
             harga={item.harga}
             reguler={item.reguler}
             kilat={item.kilat}
+            jumBerat={item.berat}
           />
         )}
       />
@@ -116,13 +120,46 @@ const SortMenu = ({judul}: menuParams) => {
   );
 };
 
-const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
+const CardMitra = ({
+  id,
+  nama,
+  foto,
+  alamat,
+  harga,
+  reguler,
+  kilat,
+  jumBerat,
+}: cardParams) => {
+  const route = useRoute<RootRouteProps<'Mitra'>>();
+  const berat = route.params.berat;
+  const durasi = route.params.durasi;
   const [isFocused, setIsFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
+  const sisaEstimasi = id % 2 === 0 ? kilat * jumBerat : reguler + jumBerat;
+  const estimasi =
+    durasi === 'Kilat'
+      ? berat * kilat + sisaEstimasi
+      : berat * reguler + sisaEstimasi;
+  const waktuEstimasi = {jam: 0, menit: 0};
+  if (estimasi < 60) {
+    waktuEstimasi.menit = estimasi;
+  } else {
+    waktuEstimasi.jam = parseInt((estimasi / 60).toString(), 10);
+    waktuEstimasi.menit = parseInt((estimasi % 60).toString(), 10);
+  }
+  let teksEstimasi = '';
+  if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit !== 0) {
+    teksEstimasi = `${waktuEstimasi.jam} Jam ${waktuEstimasi.menit} Menit`;
+  } else if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit === 0) {
+    teksEstimasi = `${waktuEstimasi.jam} Jam`;
+  } else {
+    teksEstimasi = `${waktuEstimasi.menit} Menit`;
+  }
   return (
     <TouchableOpacity
       onPress={() => {
@@ -159,12 +196,10 @@ const CardMitra = ({nama, foto, alamat, harga, reguler, kilat}: cardParams) => {
           <Text className="text-lg text-black font-bold">
             {formatter.format(harga)}/Kg
           </Text>
-          <View>
-            <Text className="text-sm text-black">
-              Reguler: {String(reguler)} Hari
-            </Text>
-            <Text className="text-sm text-black">
-              Kilat: {String(kilat)} Jam
+          <View className="flex items-end">
+            <Text className="text-sm text-black">Estimasi Pengerjaan</Text>
+            <Text className="text-base text-black font-bold">
+              {teksEstimasi}
             </Text>
           </View>
         </View>

@@ -155,9 +155,9 @@ const Alamat = () => {
         <Text className="text-black text-base">Pakaian diambil dari</Text>
         <TouchableOpacity>
           <View className="flex flex-row items-center space-x-1">
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
-            <View className="w-1 h-1 border-[1px] rounded-full bg-black"></View>
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
+            <View className="w-1 h-1 border-[1px] rounded-full bg-black" />
           </View>
         </TouchableOpacity>
       </View>
@@ -175,6 +175,7 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
   const harga = biaya * berat;
   const kelipatanDurasi =

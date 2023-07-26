@@ -164,6 +164,7 @@ const CardPaket = ({jenis}: cardParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
   if (jenis === 'Gold') {
     jumlah = '60';

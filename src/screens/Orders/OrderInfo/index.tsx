@@ -241,6 +241,7 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
   return (
     <View className="w-full">
