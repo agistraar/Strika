@@ -19,6 +19,7 @@ export type routeOrderParams = {
     harga: string;
     foto: string;
     nama: string;
+    payment: string;
   };
   Ulasan: {
     berat: number;
@@ -28,6 +29,7 @@ export type routeOrderParams = {
     harga: string;
     foto: string;
     nama: string;
+    payment: string;
   };
   Review: {
     berat: number;
@@ -37,6 +39,7 @@ export type routeOrderParams = {
     harga: string;
     foto: string;
     nama: string;
+    payment: string;
     rating: number;
     komentar: string;
   };
