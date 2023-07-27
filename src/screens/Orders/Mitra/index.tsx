@@ -16,6 +16,8 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Data from '../../../data/data.json';
+import DropDownPicker from 'react-native-dropdown-picker';
+import Toast from 'react-native-toast-message';
 
 type menuParams = {
   judul: string;
@@ -266,6 +268,7 @@ const BottomModal = ({
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
+    minimumFractionDigits: 0,
   });
   const route = useRoute<RootRouteProps<'Mitra'>>();
   const berat = route.params.berat;
@@ -274,6 +277,61 @@ const BottomModal = ({
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
   const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+
+  const [openPayment, setOpenPayment] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState('');
+  const [dataPayment, setDataPayment] = useState([
+    {
+      label: 'Cash',
+      value: 'Cash',
+      icon: () => (
+        <Image
+          source={require('../../../icons/money.png')}
+          className="h-4 w-14"
+        />
+      ),
+    },
+    {
+      label: 'Dana',
+      value: 'Dana',
+      icon: () => (
+        <Image
+          source={require('../../../icons/dana.png')}
+          className="h-4 w-14"
+        />
+      ),
+    },
+    {
+      label: 'Gopay',
+      value: 'Gopay',
+      icon: () => (
+        <Image
+          source={require('../../../icons/gopay.png')}
+          className="h-4 w-14"
+        />
+      ),
+    },
+    {
+      label: 'ShopeePay',
+      value: 'ShopeePay',
+      icon: () => (
+        <Image
+          source={require('../../../icons/sppay.png')}
+          className="h-4 w-14"
+        />
+      ),
+    },
+    {
+      label: 'Ovo',
+      value: 'Ovo',
+      icon: () => (
+        <Image
+          source={require('../../../icons/ovo.png')}
+          className="h-4 w-14"
+        />
+      ),
+    },
+  ]);
 
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
@@ -334,30 +392,68 @@ const BottomModal = ({
               </Text>
             </View>
           </View>
+          <View className="w-full flex justify-start mt-4 mb-1">
+            <Text className="text-lg text-black">Metode Pembayaran</Text>
+          </View>
+          <DropDownPicker
+            open={openPayment}
+            value={selectedPayment}
+            items={dataPayment}
+            setOpen={setOpenPayment}
+            setValue={setSelectedPayment}
+            setItems={setDataPayment}
+            placeholder="Pilih Metode Pembayaran"
+            dropDownDirection="BOTTOM"
+            style={{
+              borderRadius: 30,
+              paddingHorizontal: 20,
+            }}
+            dropDownContainerStyle={{
+              position: 'relative',
+              height: 90,
+              top: -2,
+              borderRadius: 30,
+            }}
+          />
         </View>
         <TouchableOpacity
           className="w-full bg-primary py-2 rounded-3xl"
           onPress={() => {
-            set(false);
-            setParent(false);
-            reset(false);
-            navigationOrder.push('OrderInfo', {
-              berat: berat,
-              harga: String(biaya),
-              foto: foto,
-              nama: nama,
-              durasi: durasi,
-              rapi: route.params.rapi,
-              kusut: route.params.kusut,
-            });
+            if (selectedPayment === '') {
+              paymentToast();
+            } else {
+              set(false);
+              setParent(false);
+              reset(false);
+              navigationOrder.push('OrderInfo', {
+                berat: berat,
+                harga: String(biaya),
+                foto: foto,
+                nama: nama,
+                durasi: durasi,
+                rapi: route.params.rapi,
+                kusut: route.params.kusut,
+                payment: selectedPayment,
+              });
+            }
           }}>
           <Text className="text-base font-bold text-white w-full text-center">
             Konfirmasi Mitra
           </Text>
         </TouchableOpacity>
       </View>
+      <Toast position="top" topOffset={20} />
     </Modal>
   );
+};
+
+const paymentToast = () => {
+  Toast.show({
+    type: 'error',
+    text1: 'Pilih Metode Pembayaran',
+    autoHide: true,
+    visibilityTime: 3000,
+  });
 };
 
 export default Mitra;

@@ -53,6 +53,7 @@ const Review = () => {
   const rapi = route.params.rapi;
   const rating = route.params.rating;
   const komentar = route.params.komentar;
+  const metodePembayaran = route.params.payment;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -117,6 +118,14 @@ const Review = () => {
           </View>
           <View>
             <Harga berat={berat} durasi={durasi} biaya={parseInt(harga, 10)} />
+          </View>
+          <View>
+            <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
+              <Text className="text-black text-base">Metode Pembayaran</Text>
+              <Text className="text-black text-base font-bold">
+                {metodePembayaran}
+              </Text>
+            </View>
           </View>
           <View>
             <Rating ratingValue={rating} />

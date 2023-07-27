@@ -25,6 +25,7 @@ const Ulasan = () => {
   const durasi = route.params.durasi;
   const rapi = route.params.rapi;
   const kusut = route.params.kusut;
+  const metodePembayaran = route.params.payment;
 
   const [value, onChangeValue] = useState('');
   return (
@@ -97,6 +98,7 @@ const Ulasan = () => {
                 kusut: kusut,
                 rating: rating,
                 komentar: value,
+                payment: metodePembayaran,
               });
             }}>
             <Text className="text-base font-bold text-white w-full text-center">

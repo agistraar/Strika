@@ -199,7 +199,7 @@ const BtnKonfirmasi = ({berat, kusut, rapi, durasi}: confirParams) => {
           durasi: durasi,
         });
       }}>
-      <View className="w-full rounded-3xl bg-primary flex justify-center items-center py-2">
+      <View className="w-full rounded-3xl bg-primary flex justify-center items-center py-2 mb-4">
         <Text className="text-white text-lg font-bold">Konfirmasi Order</Text>
       </View>
     </TouchableOpacity>

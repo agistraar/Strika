@@ -115,6 +115,7 @@ const BotSheet = () => {
   const durasi = route.params.durasi;
   const rapi = route.params.rapi;
   const kusut = route.params.kusut;
+  const metodePembayaran = route.params.payment;
 
   return (
     <BottomSheet
@@ -190,6 +191,14 @@ const BotSheet = () => {
           <View>
             <Harga biaya={parseInt(harga, 10)} durasi={durasi} berat={berat} />
           </View>
+          <View>
+            <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
+              <Text className="text-black text-base">Metode Pembayaran</Text>
+              <Text className="text-black text-base font-bold">
+                {metodePembayaran}
+              </Text>
+            </View>
+          </View>
           <View className="flex space-y-3 pt-10">
             <TouchableOpacity
               className="w-full bg-primary py-2 rounded-3xl"
@@ -202,6 +211,7 @@ const BotSheet = () => {
                   durasi: durasi,
                   rapi: rapi,
                   kusut: kusut,
+                  payment: metodePembayaran,
                 });
               }}>
               <Text className="text-base font-bold text-white w-full text-center">
