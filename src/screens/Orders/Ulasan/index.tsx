@@ -30,7 +30,7 @@ const Ulasan = () => {
   const [value, onChangeValue] = useState('');
   return (
     <KeyboardAvoidingScrollView>
-      <SafeAreaView className="w-full h-full flex items-center bg-white justify-center space-y-2 pt-8">
+      <SafeAreaView className="w-full h-screen flex items-center bg-white justify-center space-y-2">
         <View className="absolute self-start top-4 left-4">
           <TouchableOpacity
             onPress={() => {

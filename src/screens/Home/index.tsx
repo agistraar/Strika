@@ -255,7 +255,7 @@ const BotNavBar = () => {
           <Image source={require('../../icons/user.png')} />
         </TouchableOpacity>
       </View>
-      <View className="w-20 h-20 z-10 bg-white absolute -top-7 right-1/2 left-1/2 rounded-full box-border p-4 flex items-center justify-center">
+      <View className="w-20 h-20 z-10 bg-white absolute -top-7 left-40 rounded-full box-border p-4  items-center justify-center">
         <TouchableOpacity
           className="h-full w-full"
           onPress={() => {

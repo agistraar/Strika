@@ -224,7 +224,9 @@ const Harga = ({biaya, durasi, berat, rapi, kusut}: hargaParams) => {
         </View>
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-black text-base">Ongkos Kirim</Text>
-          <Text className="text-black text-base">{ongkir}</Text>
+          <Text className="text-black text-base">
+            {formatter.format(ongkir)}
+          </Text>
         </View>
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-black text-base">Durasi {durasi}</Text>
