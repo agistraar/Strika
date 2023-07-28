@@ -17,6 +17,8 @@ type hargaParams = {
   harga: number;
   durasi: String;
   berat: number;
+  kusut: string;
+  rapi: string;
 };
 
 type metodeParams = {
@@ -62,7 +64,13 @@ const Detail = () => {
             {berat.toString().replace('.', ',')}Kg
           </Text>
         </View>
-        <Harga harga={totalHarga} durasi={durasi} berat={berat} />
+        <Harga
+          harga={totalHarga}
+          durasi={durasi}
+          berat={berat}
+          kusut={kusut}
+          rapi={rapi}
+        />
         <Info />
         <BtnKonfirmasi
           berat={route.params.berat}
@@ -116,16 +124,21 @@ const Alamat = () => {
   );
 };
 
-const Harga = ({harga, durasi}: hargaParams) => {
+const Harga = ({harga, durasi, kusut, rapi}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
     minimumFractionDigits: 0,
   });
+  let ongkir = 0;
+  if (kusut === 'Diambil') {
+    ongkir += 5000;
+  }
+  if (rapi === 'Diantar') {
+    ongkir += 5000;
+  }
 
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
 
   return (
     <View className="w-full flex mt-4">
@@ -143,6 +156,16 @@ const Harga = ({harga, durasi}: hargaParams) => {
           <Text className="text-black text-base">
             {formatter.format(harga)}
           </Text>
+        </View>
+        <View className="w-full flex flex-row items-center justify-between">
+          <View>
+            <Text className="text-black text-base">Ongkos Kirim</Text>
+            <Text className="text-black text-xs">
+              {'(5.000 setiap pengantaran/penjemputan mitra)'}
+            </Text>
+          </View>
+
+          <Text className="text-black text-base">{ongkir}</Text>
         </View>
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-black text-base">Durasi {durasi}</Text>

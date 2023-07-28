@@ -6,7 +6,7 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 import {Dimensions} from 'react-native';
 import Lottie from 'lottie-react-native';
 
@@ -19,6 +19,8 @@ type hargaParams = {
   biaya: number;
   durasi: string;
   berat: number;
+  kusut: string;
+  rapi: string;
 };
 
 const OrderInfo = () => {
@@ -118,27 +120,6 @@ const BotSheet = () => {
   const kusut = route.params.kusut;
   const metodePembayaran = route.params.payment;
 
-  const [status, setStatus] = useState([
-    {done: false, teks: 'Mengambil Pakaian'},
-    {done: false, teks: 'Menimbang Pakaian'},
-    {done: false, teks: 'Menyetrika Pakaian'},
-    {done: false, teks: 'Mengantar Pakaian'},
-  ]);
-
-  const toggleDone = (index: number) => {
-    let newStatus = [...status];
-    newStatus[index].done = true;
-    setStatus(newStatus);
-  };
-  let indeks = 0;
-  let statusInterval: number = setInterval(() => {
-    if (indeks === 3) {
-      clearInterval(statusInterval);
-    }
-    toggleDone(indeks);
-    indeks++;
-  }, 2000);
-
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -188,14 +169,10 @@ const BotSheet = () => {
               <Text className="text-black text-base">Status Pengerjaan</Text>
             </View>
             <View className="flex-col border-[1px] border-t-0 items-start border-gray-300 rounded-b-3xl px-3 py-2">
-              <FlatList
-                className="w-full"
-                data={status}
-                scrollEnabled={false}
-                renderItem={({item}) => (
-                  <Progress status={item.teks} isDone={item.done} />
-                )}
-              />
+              <Progress status="Mengambil Pakaian" isDone={true} />
+              <Progress status="Menimbang Pakaian" isDone={true} />
+              <Progress status="Menyetrika Pakaian" isDone={false} />
+              <Progress status="Mengantar Pakaian" isDone={false} />
             </View>
           </View>
           <View>
@@ -215,7 +192,13 @@ const BotSheet = () => {
             </View>
           </View>
           <View>
-            <Harga biaya={parseInt(harga, 10)} durasi={durasi} berat={berat} />
+            <Harga
+              biaya={parseInt(harga, 10)}
+              durasi={durasi}
+              berat={berat}
+              kusut={kusut}
+              rapi={rapi}
+            />
           </View>
           <View className="flex space-y-3 pt-10">
             <TouchableOpacity
@@ -271,14 +254,19 @@ const Progress = ({status, isDone}: progressParams) => {
   );
 };
 
-const Harga = ({biaya, durasi, berat}: hargaParams) => {
+const Harga = ({biaya, durasi, berat, kusut, rapi}: hargaParams) => {
   const harga = biaya * berat;
+  let ongkir = 0;
+  if (kusut === 'Diambil') {
+    ongkir += 5000;
+  }
+  if (rapi === 'Diantar') {
+    ongkir += 5000;
+  }
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
   const formatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
     minimumFractionDigits: 0,
   });
   return (
@@ -292,6 +280,10 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
           <Text className="text-base text-black">
             {formatter.format(harga)}
           </Text>
+        </View>
+        <View className="w-full flex flex-row items-center justify-between">
+          <Text className="text-black text-base">Ongkos Kirim</Text>
+          <Text className="text-black text-base">{ongkir}</Text>
         </View>
         <View className="w-full flex flex-row justify-between items-center">
           <Text className="text-base text-black">Durasi {durasi}</Text>
@@ -315,33 +307,30 @@ const iconPembayaran = (metode: string) => {
     return (
       <Image
         source={require('../../../icons/money.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Dana') {
     return (
-      <Image
-        source={require('../../../icons/dana.png')}
-        className="h-10 w-24"
-      />
+      <Image source={require('../../../icons/dana.png')} className="h-8 w-20" />
     );
   } else if (metode === 'Gopay') {
     return (
       <Image
         source={require('../../../icons/gopay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'ShopeePay') {
     return (
       <Image
         source={require('../../../icons/sppay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Ovo') {
     return (
-      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+      <Image source={require('../../../icons/ovo.png')} className="h-8 w-20" />
     );
   }
 };

@@ -27,6 +27,8 @@ type hargaParams = {
   biaya: number;
   durasi: string;
   berat: number;
+  rapi: string;
+  kusut: string;
 };
 
 type ratingParams = {
@@ -117,7 +119,13 @@ const Review = () => {
             </Text>
           </View>
           <View>
-            <Harga berat={berat} durasi={durasi} biaya={parseInt(harga, 10)} />
+            <Harga
+              berat={berat}
+              durasi={durasi}
+              biaya={parseInt(harga, 10)}
+              rapi={rapi}
+              kusut={kusut}
+            />
           </View>
           <View>
             <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
@@ -187,16 +195,21 @@ const Alamat = () => {
   );
 };
 
-const Harga = ({biaya, durasi, berat}: hargaParams) => {
+const Harga = ({biaya, durasi, berat, rapi, kusut}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
     minimumFractionDigits: 0,
   });
+  let ongkir = 0;
+  if (kusut === 'Diambil') {
+    ongkir += 5000;
+  }
+  if (rapi === 'Diantar') {
+    ongkir += 5000;
+  }
   const harga = biaya * berat;
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
   return (
     <View className="w-full flex">
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
@@ -208,6 +221,10 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
           <Text className="text-black text-base">
             {formatter.format(harga)}
           </Text>
+        </View>
+        <View className="w-full flex flex-row items-center justify-between">
+          <Text className="text-black text-base">Ongkos Kirim</Text>
+          <Text className="text-black text-base">{ongkir}</Text>
         </View>
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-black text-base">Durasi {durasi}</Text>
@@ -278,33 +295,30 @@ const iconPembayaran = (metode: string) => {
     return (
       <Image
         source={require('../../../icons/money.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Dana') {
     return (
-      <Image
-        source={require('../../../icons/dana.png')}
-        className="h-10 w-24"
-      />
+      <Image source={require('../../../icons/dana.png')} className="h-8 w-20" />
     );
   } else if (metode === 'Gopay') {
     return (
       <Image
         source={require('../../../icons/gopay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'ShopeePay') {
     return (
       <Image
         source={require('../../../icons/sppay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Ovo') {
     return (
-      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+      <Image source={require('../../../icons/ovo.png')} className="h-8 w-20" />
     );
   }
 };

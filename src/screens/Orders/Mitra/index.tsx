@@ -158,8 +158,6 @@ const CardMitra = ({
   const [isFocused, setIsFocused] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const formatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
     minimumFractionDigits: 0,
   });
   const sisaEstimasi = id % 2 === 0 ? kilat * jumBerat : reguler + jumBerat;
@@ -286,17 +284,25 @@ const BottomModal = ({
   nama,
 }: modalParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
     minimumFractionDigits: 0,
   });
   const route = useRoute<RootRouteProps<'Mitra'>>();
   const berat = route.params.berat;
   const harga = (biaya + 1300) * berat;
   const durasi = route.params.durasi;
+  const kusut = route.params.kusut;
+  const rapi = route.params.rapi;
+  let ongkir = 0;
+  if (kusut === 'Diambil') {
+    ongkir += 5000;
+  }
+  if (rapi === 'Diantar') {
+    ongkir += 5000;
+  }
+
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
   const [pembayaranVisible, setPembayaranVisible] = useState(false);
 
   const [selectedPayment, setSelectedPayment] = useState('');
@@ -337,6 +343,16 @@ const BottomModal = ({
               <Text className="text-base text-black">
                 {formatter.format(harga)}
               </Text>
+            </View>
+            <View className="w-full flex flex-row items-center justify-between">
+              <View>
+                <Text className="text-black text-base">Ongkos Kirim</Text>
+                <Text className="text-black text-xs">
+                  {'(5.000 setiap pengantaran/penjemputan mitra)'}
+                </Text>
+              </View>
+
+              <Text className="text-black text-base">{ongkir}</Text>
             </View>
             <View className="w-full flex flex-row justify-between items-center">
               <Text className="text-base text-black">Durasi {durasi}</Text>
@@ -491,33 +507,30 @@ const iconPembayaran = (metode: string) => {
     return (
       <Image
         source={require('../../../icons/money.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Dana') {
     return (
-      <Image
-        source={require('../../../icons/dana.png')}
-        className="h-10 w-24"
-      />
+      <Image source={require('../../../icons/dana.png')} className="h-8 w-20" />
     );
   } else if (metode === 'Gopay') {
     return (
       <Image
         source={require('../../../icons/gopay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'ShopeePay') {
     return (
       <Image
         source={require('../../../icons/sppay.png')}
-        className="h-10 w-24"
+        className="h-8 w-20"
       />
     );
   } else if (metode === 'Ovo') {
     return (
-      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+      <Image source={require('../../../icons/ovo.png')} className="h-8 w-20" />
     );
   }
 };
