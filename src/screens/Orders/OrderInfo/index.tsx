@@ -6,12 +6,13 @@ import BottomSheet from '@gorhom/bottom-sheet';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
-import {ScrollView} from 'react-native-gesture-handler';
+import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import {Dimensions} from 'react-native';
 import Lottie from 'lottie-react-native';
 
 type progressParams = {
   status: string;
+  isDone: boolean;
 };
 
 type hargaParams = {
@@ -24,7 +25,7 @@ const OrderInfo = () => {
   const [isLoading, setIsLoading] = useState(true);
   setTimeout(() => {
     setIsLoading(false);
-  }, 5000);
+  }, 2000);
 
   return isLoading ? <SplashScreen /> : <MainScreen />;
 };
@@ -32,7 +33,7 @@ const OrderInfo = () => {
 const SplashScreen = () => {
   return (
     <View className="w-full h-full flex justify-center items-center bg-white">
-      <View className="w-full h-48 flex items-center justify-center space-y-2">
+      <View className="w-full h-48 flex items-center justify-center bg-white space-y-2">
         <Image
           className="w-40 h-40"
           source={require('../../../image/icon3.png')}
@@ -117,6 +118,27 @@ const BotSheet = () => {
   const kusut = route.params.kusut;
   const metodePembayaran = route.params.payment;
 
+  const [status, setStatus] = useState([
+    {done: false, teks: 'Mengambil Pakaian'},
+    {done: false, teks: 'Menimbang Pakaian'},
+    {done: false, teks: 'Menyetrika Pakaian'},
+    {done: false, teks: 'Mengantar Pakaian'},
+  ]);
+
+  const toggleDone = (index: number) => {
+    let newStatus = [...status];
+    newStatus[index].done = true;
+    setStatus(newStatus);
+  };
+  let indeks = 0;
+  let statusInterval: number = setInterval(() => {
+    if (indeks === 3) {
+      clearInterval(statusInterval);
+    }
+    toggleDone(indeks);
+    indeks++;
+  }, 2000);
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -166,18 +188,22 @@ const BotSheet = () => {
               <Text className="text-black text-base">Status Pengerjaan</Text>
             </View>
             <View className="flex-col border-[1px] border-t-0 items-start border-gray-300 rounded-b-3xl px-3 py-2">
-              <Progress status="Mengambil Pakaian" />
-              <Progress status="Menimbang Pakaian" />
-              <Progress status="Menyetrika Pakaian" />
-              <Progress status="Mengantar Pakaian" />
+              <FlatList
+                className="w-full"
+                data={status}
+                scrollEnabled={false}
+                renderItem={({item}) => (
+                  <Progress status={item.teks} isDone={item.done} />
+                )}
+              />
             </View>
           </View>
           <View>
             <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
               <Text className="text-black text-base">Metode Pembayaran</Text>
             </View>
-            <View className="flex border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
-              <Text className="text-black text-base font-bold">Tunai</Text>
+            <View className="flex flex-row items-center justify-start border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
+              {iconPembayaran(metodePembayaran)}
             </View>
           </View>
           <View>
@@ -190,14 +216,6 @@ const BotSheet = () => {
           </View>
           <View>
             <Harga biaya={parseInt(harga, 10)} durasi={durasi} berat={berat} />
-          </View>
-          <View>
-            <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
-              <Text className="text-black text-base">Metode Pembayaran</Text>
-              <Text className="text-black text-base font-bold">
-                {metodePembayaran}
-              </Text>
-            </View>
           </View>
           <View className="flex space-y-3 pt-10">
             <TouchableOpacity
@@ -234,10 +252,20 @@ const BotSheet = () => {
   );
 };
 
-const Progress = ({status}: progressParams) => {
+const Progress = ({status, isDone}: progressParams) => {
   return (
     <View className="flex-row space-x-3 items-center mb-3">
-      <Image className="h-8 w-8" source={require('../../../icons/done.png')} />
+      {isDone ? (
+        <Image
+          className="h-8 w-8"
+          source={require('../../../icons/done.png')}
+        />
+      ) : (
+        <Image
+          className="h-8 w-8"
+          source={require('../../../icons/undone.png')}
+        />
+      )}
       <Text className="text-black text-base">{status}</Text>
     </View>
   );
@@ -269,23 +297,53 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
           <Text className="text-base text-black">Durasi {durasi}</Text>
           <Text className="text-base text-black">{kelipatanDurasi}</Text>
         </View>
-        <View className="w-full flex flex-row justify-between items-center">
-          <Text className="text-base text-black">Biaya Aplikasi</Text>
-          <Text className="text-base text-black">
-            {formatter.format(1300 * berat)}
-          </Text>
-        </View>
       </View>
       <View className="w-full flex border-[1px] border-gray-300 rounded-b-3xl px-4 py-2">
         <View className="w-full flex flex-row items-center justify-between">
           <Text className="text-base text-black font-bold">Total</Text>
           <Text className="text-base text-black font-bold">
-            {formatter.format(totalHarga + 1300 * berat)}
+            {formatter.format(totalHarga)}
           </Text>
         </View>
       </View>
     </View>
   );
+};
+
+const iconPembayaran = (metode: string) => {
+  if (metode === 'Cash') {
+    return (
+      <Image
+        source={require('../../../icons/money.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Dana') {
+    return (
+      <Image
+        source={require('../../../icons/dana.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Gopay') {
+    return (
+      <Image
+        source={require('../../../icons/gopay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'ShopeePay') {
+    return (
+      <Image
+        source={require('../../../icons/sppay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Ovo') {
+    return (
+      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+    );
+  }
 };
 
 export default OrderInfo;

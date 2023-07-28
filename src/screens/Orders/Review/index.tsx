@@ -71,7 +71,7 @@ const Review = () => {
   );
 
   return (
-    <SafeAreaView className="w-full h-full flex items-center space-y-2 pt-4">
+    <SafeAreaView className="w-full h-full bg-white flex items-center space-y-2 pt-4">
       <View className="w-full px-6 flex flex-row items-center space-x-3 mb-2">
         <TouchableOpacity
           onPress={() => {
@@ -120,11 +120,11 @@ const Review = () => {
             <Harga berat={berat} durasi={durasi} biaya={parseInt(harga, 10)} />
           </View>
           <View>
-            <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
+            <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
               <Text className="text-black text-base">Metode Pembayaran</Text>
-              <Text className="text-black text-base font-bold">
-                {metodePembayaran}
-              </Text>
+            </View>
+            <View className="flex flex-row items-center justify-start border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
+              {iconPembayaran(metodePembayaran)}
             </View>
           </View>
           <View>
@@ -133,6 +133,13 @@ const Review = () => {
           <View>
             <Komentar value={komentar} />
           </View>
+          <TouchableOpacity
+            className="w-full bg-white border-rose-600 border-[1px] py-2 rounded-3xl"
+            onPress={() => {}}>
+            <Text className="text-base font-bold text-rose-600 w-full text-center">
+              Laporkan Mitra
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -206,17 +213,11 @@ const Harga = ({biaya, durasi, berat}: hargaParams) => {
           <Text className="text-black text-base">Durasi {durasi}</Text>
           <Text className="text-black text-base">{kelipatanDurasi}</Text>
         </View>
-        <View className="w-full flex flex-row justify-between items-center">
-          <Text className="text-base text-black">Biaya Aplikasi</Text>
-          <Text className="text-base text-black">
-            {formatter.format(1300 * berat)}
-          </Text>
-        </View>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
         <Text className="text-black text-base font-bold">Total</Text>
         <Text className="text-black text-base font-bold">
-          {formatter.format(totalHarga + 1300 * berat)}
+          {formatter.format(totalHarga)}
         </Text>
       </View>
     </View>
@@ -270,6 +271,42 @@ const Rating = ({ratingValue}: ratingParams) => {
       </View>
     </View>
   );
+};
+
+const iconPembayaran = (metode: string) => {
+  if (metode === 'Cash') {
+    return (
+      <Image
+        source={require('../../../icons/money.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Dana') {
+    return (
+      <Image
+        source={require('../../../icons/dana.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Gopay') {
+    return (
+      <Image
+        source={require('../../../icons/gopay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'ShopeePay') {
+    return (
+      <Image
+        source={require('../../../icons/sppay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Ovo') {
+    return (
+      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+    );
+  }
 };
 
 export default Review;

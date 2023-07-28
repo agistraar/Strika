@@ -33,7 +33,7 @@ type confirParams = {
 
 const Detail = () => {
   const route = useRoute<RootRouteProps<'Detail'>>();
-  const totalHarga = route.params.berat * 6000;
+  const totalHarga = route.params.berat * (6000 + 1300);
   const kusut = route.params.kusut;
   const rapi = route.params.rapi;
   const durasi = route.params.durasi;
@@ -116,7 +116,7 @@ const Alamat = () => {
   );
 };
 
-const Harga = ({harga, durasi, berat}: hargaParams) => {
+const Harga = ({harga, durasi}: hargaParams) => {
   const formatter = new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
@@ -148,22 +148,13 @@ const Harga = ({harga, durasi, berat}: hargaParams) => {
           <Text className="text-black text-base">Durasi {durasi}</Text>
           <Text className="text-black text-base">{kelipatanDurasi}</Text>
         </View>
-        <View className="w-full flex flex-row items-center justify-between">
-          <View>
-            <Text className="text-black text-base">Biaya Aplikasi</Text>
-            <Text className="text-black text-xs">{'(Rp. 1.300/kg)'}</Text>
-          </View>
-          <Text className="text-black text-base">
-            {formatter.format(1300 * berat)}
-          </Text>
-        </View>
       </View>
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
         <Text className="text-black text-base font-bold">
           Total Harga Perkiraan
         </Text>
         <Text className="text-black text-base font-bold">
-          {formatter.format(totalHarga + 1300 * berat)}
+          {formatter.format(totalHarga)}
         </Text>
       </View>
     </View>
@@ -200,7 +191,7 @@ const BtnKonfirmasi = ({berat, kusut, rapi, durasi}: confirParams) => {
         });
       }}>
       <View className="w-full rounded-3xl bg-primary flex justify-center items-center py-2 mb-4">
-        <Text className="text-white text-lg font-bold">Konfirmasi Order</Text>
+        <Text className="text-white text-lg font-bold">Pilih Mitra</Text>
       </View>
     </TouchableOpacity>
   );

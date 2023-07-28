@@ -16,7 +16,6 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Data from '../../../data/data.json';
-import DropDownPicker from 'react-native-dropdown-picker';
 import Toast from 'react-native-toast-message';
 
 type menuParams = {
@@ -42,6 +41,27 @@ type modalParams = {
   biaya: number;
   foto: string;
   nama: string;
+};
+
+type paymentModalParams = {
+  visible: boolean;
+  set: Function;
+  setData: Function;
+};
+
+type paymentListParams = {
+  label: string;
+  setData: Function;
+  set: Function;
+};
+
+type conPemBeforeParams = {
+  set: Function;
+};
+
+type conPemAfterParams = {
+  set: Function;
+  label: string;
 };
 
 const Mitra = () => {
@@ -196,7 +216,7 @@ const CardMitra = ({
         </View>
         <View className="w-full flex flex-row justify-between items-center p-2 px-4">
           <Text className="text-lg text-black font-bold">
-            {formatter.format(harga)}/Kg
+            {formatter.format(harga + 1300)}/Kg
           </Text>
           <View className="flex items-end">
             <Text className="text-sm text-black">Estimasi Pengerjaan</Text>
@@ -272,66 +292,14 @@ const BottomModal = ({
   });
   const route = useRoute<RootRouteProps<'Mitra'>>();
   const berat = route.params.berat;
-  const harga = biaya * berat;
+  const harga = (biaya + 1300) * berat;
   const durasi = route.params.durasi;
   const kelipatanDurasi =
     durasi === 'Kilat' ? '2x lipat harga awal' : 'Tidak ada kelipatan';
   const totalHarga = durasi === 'Kilat' ? harga * 2 : harga;
+  const [pembayaranVisible, setPembayaranVisible] = useState(false);
 
-  const [openPayment, setOpenPayment] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState('');
-  const [dataPayment, setDataPayment] = useState([
-    {
-      label: 'Cash',
-      value: 'Cash',
-      icon: () => (
-        <Image
-          source={require('../../../icons/money.png')}
-          className="h-4 w-14"
-        />
-      ),
-    },
-    {
-      label: 'Dana',
-      value: 'Dana',
-      icon: () => (
-        <Image
-          source={require('../../../icons/dana.png')}
-          className="h-4 w-14"
-        />
-      ),
-    },
-    {
-      label: 'Gopay',
-      value: 'Gopay',
-      icon: () => (
-        <Image
-          source={require('../../../icons/gopay.png')}
-          className="h-4 w-14"
-        />
-      ),
-    },
-    {
-      label: 'ShopeePay',
-      value: 'ShopeePay',
-      icon: () => (
-        <Image
-          source={require('../../../icons/sppay.png')}
-          className="h-4 w-14"
-        />
-      ),
-    },
-    {
-      label: 'Ovo',
-      value: 'Ovo',
-      icon: () => (
-        <Image
-          source={require('../../../icons/ovo.png')}
-          className="h-4 w-14"
-        />
-      ),
-    },
-  ]);
 
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
@@ -374,47 +342,23 @@ const BottomModal = ({
               <Text className="text-base text-black">Durasi {durasi}</Text>
               <Text className="text-base text-black">{kelipatanDurasi}</Text>
             </View>
-            <View className="w-full flex flex-row justify-between items-center">
-              <View>
-                <Text className="text-black text-base">Biaya Aplikasi</Text>
-                <Text className="text-black text-xs">{'(Rp. 1.300/Kg)'}</Text>
-              </View>
-              <Text className="text-base text-black">
-                {formatter.format(1300 * berat)}
-              </Text>
-            </View>
           </View>
           <View className="w-full flex border-[1px] border-gray-300 rounded-b-2xl px-4 py-2">
             <View className="w-full flex flex-row items-center justify-between">
               <Text className="text-base text-black font-bold">Total</Text>
               <Text className="text-base text-black font-bold">
-                {formatter.format(totalHarga + 1300 * berat)}
+                {formatter.format(totalHarga)}
               </Text>
             </View>
           </View>
-          <View className="w-full flex justify-start mt-4 mb-1">
-            <Text className="text-lg text-black">Metode Pembayaran</Text>
-          </View>
-          <DropDownPicker
-            open={openPayment}
-            value={selectedPayment}
-            items={dataPayment}
-            setOpen={setOpenPayment}
-            setValue={setSelectedPayment}
-            setItems={setDataPayment}
-            placeholder="Pilih Metode Pembayaran"
-            dropDownDirection="BOTTOM"
-            style={{
-              borderRadius: 30,
-              paddingHorizontal: 20,
-            }}
-            dropDownContainerStyle={{
-              position: 'relative',
-              height: 90,
-              top: -2,
-              borderRadius: 30,
-            }}
-          />
+          {selectedPayment === '' ? (
+            <ContainerPembayaranBefore set={setPembayaranVisible} />
+          ) : (
+            <ContainerPembayaranAfter
+              label={selectedPayment}
+              set={setPembayaranVisible}
+            />
+          )}
         </View>
         <TouchableOpacity
           className="w-full bg-primary py-2 rounded-3xl"
@@ -427,7 +371,7 @@ const BottomModal = ({
               reset(false);
               navigationOrder.push('OrderInfo', {
                 berat: berat,
-                harga: String(biaya),
+                harga: String(biaya + 1300),
                 foto: foto,
                 nama: nama,
                 durasi: durasi,
@@ -442,15 +386,146 @@ const BottomModal = ({
           </Text>
         </TouchableOpacity>
       </View>
+      <PaymentModal
+        visible={pembayaranVisible}
+        set={setPembayaranVisible}
+        setData={setSelectedPayment}
+      />
       <Toast position="top" topOffset={20} />
     </Modal>
   );
 };
 
+const ContainerPembayaranBefore = ({set}: conPemBeforeParams) => {
+  return (
+    <View className="w-full border-[1px] border-gray-300 rounded-2xl px-4 py-2 mt-2">
+      <TouchableOpacity
+        onPress={() => {
+          set(true);
+        }}>
+        <View className="w-full flex flex-row items-center justify-between ">
+          <Text className="text-base text-black">Pilih Metode Pembayaran</Text>
+          <Image source={require('../../../icons/next.png')} />
+        </View>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+const ContainerPembayaranAfter = ({set, label}: conPemAfterParams) => {
+  return (
+    <View className="w-full mt-2">
+      <View className="w-full flex border-[1px] border-gray-300 rounded-t-2xl px-4 py-2">
+        <Text className="text-base text-black">Pilih Metode Pembayaran</Text>
+      </View>
+      <View className="w-full border-[1px] border-t-0 border-gray-300 rounded-b-2xl px-4 py-2">
+        <TouchableOpacity
+          onPress={() => {
+            set(true);
+          }}>
+          <View className="w-full flex flex-row items-center justify-start">
+            {iconPembayaran(label)}
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+const PaymentModal = ({visible, set, setData}: paymentModalParams) => {
+  const paymentData = [
+    {label: 'Cash', source: '../../../icons/money.png'},
+    {label: 'Dana', source: '../../../icons/dana.png'},
+    {label: 'Gopay', source: '../../../icons/gopay.png'},
+    {label: 'ShopeePay', source: '../../../icons/sppay.png'},
+    {label: 'Ovo', source: '../../../icons/ovo.png'},
+  ];
+  return (
+    <Modal
+      animationType="slide"
+      visible={visible}
+      onRequestClose={() => {
+        set(false);
+      }}>
+      <View className="h-screen w-full bg-white items-center justify-center">
+        <View className="w-full flex flex-row items-center space-x-4 bg-white p-4">
+          <TouchableOpacity
+            onPress={() => {
+              set(false);
+            }}>
+            <Image source={require('../../../icons/back.png')} />
+          </TouchableOpacity>
+          <Text className="text-lg text-black font-bold">
+            Metode Pembayaran
+          </Text>
+        </View>
+        <FlatList
+          className="w-full px-5 py-2"
+          data={paymentData}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item}) => (
+            <PaymentList label={item.label} setData={setData} set={set} />
+          )}
+        />
+      </View>
+    </Modal>
+  );
+};
+
+const PaymentList = ({label, setData, set}: paymentListParams) => {
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        setData(label);
+        set(false);
+      }}>
+      <View className="flex flex-row items-center justify-start px-3 py-2 border-b-[1px] border-slate-400 mb-2">
+        {iconPembayaran(label)}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const iconPembayaran = (metode: string) => {
+  if (metode === 'Cash') {
+    return (
+      <Image
+        source={require('../../../icons/money.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Dana') {
+    return (
+      <Image
+        source={require('../../../icons/dana.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Gopay') {
+    return (
+      <Image
+        source={require('../../../icons/gopay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'ShopeePay') {
+    return (
+      <Image
+        source={require('../../../icons/sppay.png')}
+        className="h-10 w-24"
+      />
+    );
+  } else if (metode === 'Ovo') {
+    return (
+      <Image source={require('../../../icons/ovo.png')} className="h-10 w-24" />
+    );
+  }
+};
+
 const paymentToast = () => {
   Toast.show({
     type: 'error',
-    text1: 'Pilih Metode Pembayaran',
+    text1: 'Silahkan Pilih Metode Pembayaran',
     autoHide: true,
     visibilityTime: 3000,
   });
