@@ -8,7 +8,6 @@
 /// <reference types="nativewind/types" />
 
 import React, {useState} from 'react';
-// import Tes from './screens/Tes';
 import {NavigationContainer} from '@react-navigation/native';
 import Router from './Router';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -26,9 +25,6 @@ function App(): JSX.Element {
         {splash ? <Splash /> : <Router />}
       </GestureHandlerRootView>
     </NavigationContainer>
-    // <View>
-    //   <Tes />
-    // </View>
   );
 }
 
