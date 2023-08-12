@@ -6,6 +6,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import React, {useState} from 'react';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
@@ -13,12 +14,17 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParams} from '../../Router';
 
+type modalParams = {
+  visible: boolean;
+};
+
 const Login = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   const [userValue, setUserValue] = useState('');
   const [userPass, setUserPass] = useState('');
   const [hidePass, setHidePass] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
   return (
     <KeyboardAvoidingScrollView className="bg-white">
       <SafeAreaView className="flex w-full h-screen items-center justify-center p-4">
@@ -71,7 +77,11 @@ const Login = () => {
           <TouchableOpacity
             className="w-full bg-primary py-2 rounded-3xl"
             onPress={() => {
-              navigation.replace('Home');
+              setModalVisible(true);
+              setTimeout(() => {
+                navigation.replace('Home');
+                setModalVisible(false);
+              }, 5000);
             }}>
             <Text className="text-base font-bold text-white w-full text-center">
               Masuk
@@ -80,8 +90,9 @@ const Login = () => {
           <TouchableOpacity
             className="w-full bg-white border-primary border-[1px] py-2 rounded-3xl"
             onPress={() => {
-              console.log('gas');
-              navigation.navigate('RegRouter');
+              navigation.navigate('RegRouter', {
+                screen: 'Handphone',
+              });
             }}>
             <Text className="text-base font-bold text-primary w-full text-center">
               Belum punya akun? Daftar
@@ -93,8 +104,22 @@ const Login = () => {
           <Text className="text-primary">Ketentuan Layanan</Text> dan{' '}
           <Text className="text-primary">Kebijakan Privasi</Text> Kami.
         </Text>
+        <AccountModal visible={modalVisible} />
       </SafeAreaView>
     </KeyboardAvoidingScrollView>
+  );
+};
+
+const AccountModal = ({visible}: modalParams) => {
+  return (
+    <Modal animationType="fade" visible={visible}>
+      <View className="h-screen w-full bg-white items-center justify-center">
+        <Image source={require('../../image/ayaka.png')} />
+        <Text className="text-lg text-black font-bold w-2/3 text-center mt-4">
+          Mohon tunggu sebentar untuk melakukan validasi akun anda
+        </Text>
+      </View>
+    </Modal>
   );
 };
 

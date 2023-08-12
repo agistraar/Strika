@@ -1,15 +1,14 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Home, Login} from '../screens';
-import OrderRouter from '../screens/Orders/OrderRouter';
-import RegRouter from '../screens/Register/RegRouter';
+import {Home, Login, OrderRouter, Profile, RegRouter} from '../screens';
 
 export type RootStackParams = {
   Login: any;
   RegRouter: any;
   Home: any;
   OrderRouter: any;
+  Profile: any;
 };
 
 const RootStack = createNativeStackNavigator();
@@ -30,6 +29,11 @@ const Router = () => {
       <RootStack.Screen
         name="Home"
         component={Home}
+        options={{headerShown: false}}
+      />
+      <RootStack.Screen
+        name="Profile"
+        component={Profile}
         options={{headerShown: false}}
       />
       <RootStack.Screen
