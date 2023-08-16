@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
@@ -13,18 +12,22 @@ import Router from './Router';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Lottie from 'lottie-react-native';
 import {View} from 'react-native';
+import {MyGlobalContext} from './context/context';
 
 function App(): JSX.Element {
+  const [userId, setUserId] = useState<number>(0);
   const [splash, setSplash] = useState(true);
   setTimeout(() => {
     setSplash(false);
   }, 4000);
   return (
-    <NavigationContainer>
-      <GestureHandlerRootView className="flex-1 w-full h-full">
-        {splash ? <Splash /> : <Router />}
-      </GestureHandlerRootView>
-    </NavigationContainer>
+    <MyGlobalContext.Provider value={{userId, setUserId}}>
+      <NavigationContainer>
+        <GestureHandlerRootView className="flex-1 w-full h-full">
+          {splash ? <Splash /> : <Router />}
+        </GestureHandlerRootView>
+      </NavigationContainer>
+    </MyGlobalContext.Provider>
   );
 }
 

@@ -77,10 +77,15 @@ const Handphone = () => {
       </View>
       <TouchableOpacity
         className="w-full bg-primary py-2 rounded-3xl"
-        onPress={() => {
+        onPress={async () => {
           if (isValid) {
-            setPhone('0' + phone);
-            navigationReg.push('Nama');
+            const dataPhone = await getPhone(phone);
+            navigationReg.push('Nama', {
+              email: '',
+              telp: dataPhone,
+              nama: '',
+              pass: '',
+            });
           }
         }}>
         <Text className="text-base font-bold text-white w-full text-center">
@@ -89,6 +94,11 @@ const Handphone = () => {
       </TouchableOpacity>
     </SafeAreaView>
   );
+};
+
+const getPhone = (phone: string) => {
+  phone = '0' + phone;
+  return phone;
 };
 
 export default Handphone;

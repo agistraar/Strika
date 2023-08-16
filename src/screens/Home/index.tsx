@@ -7,24 +7,49 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from 'react-native';
-import React, {useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, {useCallback, useState} from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParams} from '../../Router';
 import Toast from 'react-native-toast-message';
 import OrderModal from '../OrderModal';
+import {useGlobalContext} from '../../context/context';
 
 type cardParams = {
   jenis: string;
 };
 
+type profilParams = {
+  email: string;
+  nama: string;
+};
+
 const Home = () => {
+  const {userId} = useGlobalContext();
+  const [data, setData] = useState({nama: '', email: '', telp: '', alamat: ''});
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId !== 0) {
+        GetData(userId, setData, navigation);
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      }
+    }, [navigation, userId]),
+  );
+
   return (
     <SafeAreaView className=" flex flex-col w-full h-screen justify-start items-center box-border bg-white">
       <ScrollView className=" h-full w-full box-border">
         <View className="flex p-4 pt-8 pb-6 items-center w-full border-b-[1px] border-gray-300 rounded-b-3xl">
-          <Profile />
+          <Profile email={data.email} nama={data.nama} />
           <View className="px-2 pt-6 pb-0 flex flex-row items-center justify-center w-full">
             <CardMember />
           </View>
@@ -39,19 +64,19 @@ const Home = () => {
   );
 };
 
-const Profile = () => {
+const Profile = ({email, nama}: profilParams) => {
   return (
     <View className="flex flex-row max-w-full box-border p-1">
       <Image
         className="h-12 w-12 rounded-full mr-2"
-        source={{uri: 'https://i.pravatar.cc/150?u=user1@gmail.com'}}
+        source={{uri: `https://i.pravatar.cc/150?u=${email}`}}
       />
       <View className="flex flex-row justify-between items-center w-72">
         <View className="flex justify-center">
           <Text className="text-base text-black -mb-1">
             Selamat datang kembali,
           </Text>
-          <Text className="text-xl text-black font-bold">Tsaritsa</Text>
+          <Text className="text-xl text-black font-bold">{nama}</Text>
         </View>
         <TouchableOpacity
           onPress={() => {
@@ -238,7 +263,7 @@ const BotNavBar = () => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigation.push('Profile');
+            navigation.navigate('ProfileRouter');
           }}>
           <Image source={require('../../icons/user.png')} />
         </TouchableOpacity>
@@ -261,6 +286,45 @@ const BotNavBar = () => {
       />
     </View>
   );
+};
+
+const showAlert = (nav: NativeStackNavigationProp<RootStackParams>) => {
+  Alert.alert(
+    'Informasi Pengguna Belum Lengkap',
+    'Mohon Lengkapi Informasi Pengguna',
+    [
+      {
+        text: 'Lengkapi',
+        onPress: () => nav.navigate('ProfileRouter', {screen: 'Main'}),
+        style: 'default',
+      },
+    ],
+  );
+};
+
+const GetData = (
+  id: number,
+  set: Function,
+  nav: NativeStackNavigationProp<RootStackParams>,
+) => {
+  try {
+    fetch(`http://10.0.2.2:4000/pelanggan/getInfoPelanggan?id=${id}`)
+      .then(response => response.json())
+      .then(json => {
+        console.log(json);
+        set({
+          nama: json.data[0].nama,
+          email: json.data[0].email,
+          telp: json.data[0].telp,
+          alamat: json.data[0].alamat,
+        });
+        if (json.data[0].alamat === '') {
+          showAlert(nav);
+        }
+      });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const fiturToast = () => {

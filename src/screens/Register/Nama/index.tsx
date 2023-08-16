@@ -8,13 +8,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
-import {routerRegParams} from '../RegRouter';
-import {useNavigation} from '@react-navigation/native';
+import {RootRouteProps, routerRegParams} from '../RegRouter';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const Nama = () => {
   const navigationReg =
     useNavigation<NativeStackNavigationProp<routerRegParams>>();
+  const route = useRoute<RootRouteProps<'Nama'>>();
+  const dataEmail = route.params.email;
+  const dataTelp = route.params.telp;
+  const dataPass = route.params.pass;
   const [nama, setNama] = useState('');
   return (
     <SafeAreaView className="bg-white w-full h-screen p-4 flex-col justify-between">
@@ -47,7 +51,12 @@ const Nama = () => {
       <TouchableOpacity
         className="w-full bg-primary py-2 rounded-3xl"
         onPress={() => {
-          navigationReg.push('Password');
+          navigationReg.push('Password', {
+            email: dataEmail,
+            telp: dataTelp,
+            nama: nama,
+            pass: dataPass,
+          });
         }}>
         <Text className="text-base font-bold text-white w-full text-center">
           Selanjutnya

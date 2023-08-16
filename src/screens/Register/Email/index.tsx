@@ -18,7 +18,6 @@ const Email = () => {
   const [email, setEmail] = useState('');
   const [isValid, setIsValid] = useState(false);
   const [warning, setWarning] = useState(false);
-
   return (
     <SafeAreaView className="bg-white w-full h-screen p-4 flex-col justify-between">
       <View className="w-full">
@@ -73,7 +72,7 @@ const Email = () => {
         className="w-full bg-primary py-2 rounded-3xl"
         onPress={() => {
           if (isValid) {
-            navigationReg.push('Nama');
+            navigationReg.push('Nama', {email: email, telp: '', nama: '', pass: ''});
           }
         }}>
         <Text className="text-base font-bold text-white w-full text-center">

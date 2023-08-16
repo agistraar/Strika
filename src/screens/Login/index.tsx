@@ -13,12 +13,15 @@ import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParams} from '../../Router';
+import {useGlobalContext} from '../../context/context';
+import Toast from 'react-native-toast-message';
 
 type modalParams = {
   visible: boolean;
 };
 
 const Login = () => {
+  const {setUserId} = useGlobalContext();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   const [userValue, setUserValue] = useState('');
@@ -40,7 +43,7 @@ const Login = () => {
             Email atau Nomor Handphone
           </Text>
           <TextInput
-            className="w-full border-[1px] border-gray-300 rounded-full p-2 text-black"
+            className="w-full border-[1px] border-gray-300 rounded-full p-2 px-5 text-black"
             onChangeText={text => setUserValue(text)}
             value={userValue}
           />
@@ -77,11 +80,38 @@ const Login = () => {
           <TouchableOpacity
             className="w-full bg-primary py-2 rounded-3xl"
             onPress={() => {
-              setModalVisible(true);
-              setTimeout(() => {
-                navigation.replace('Home');
-                setModalVisible(false);
-              }, 5000);
+              if (userValue !== '' && userPass !== '') {
+                setModalVisible(true);
+                const data = {
+                  user: userValue,
+                  pass: userPass,
+                };
+                try {
+                  fetch('http://10.0.2.2:4000/pelanggan/login', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                  })
+                    .then(response => response.json())
+                    .then(json => {
+                      if (json.code === 200) {
+                        setUserId(json.data);
+                        navigation.replace('Home');
+                        setModalVisible(false);
+                      } else if (json.code === 404) {
+                        setModalVisible(false);
+                        failedToast();
+                      }
+                    });
+                } catch (err) {
+                  setModalVisible(false);
+                  failedToast();
+                }
+              } else {
+                emptyToast();
+              }
             }}>
             <Text className="text-base font-bold text-white w-full text-center">
               Masuk
@@ -106,6 +136,7 @@ const Login = () => {
         </Text>
         <AccountModal visible={modalVisible} />
       </SafeAreaView>
+      <Toast position="top" topOffset={20} />
     </KeyboardAvoidingScrollView>
   );
 };
@@ -121,6 +152,26 @@ const AccountModal = ({visible}: modalParams) => {
       </View>
     </Modal>
   );
+};
+
+const failedToast = () => {
+  Toast.show({
+    type: 'error',
+    text1: 'Login Gagal',
+    text2: 'Periksa Username atau Password Anda',
+    autoHide: true,
+    visibilityTime: 3000,
+  });
+};
+
+const emptyToast = () => {
+  Toast.show({
+    type: 'error',
+    text1: 'Data tidak lengkap',
+    text2: 'Mohon isi Username atau Password Anda',
+    autoHide: true,
+    visibilityTime: 3000,
+  });
 };
 
 export default Login;

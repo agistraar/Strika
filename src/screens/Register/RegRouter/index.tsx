@@ -5,13 +5,19 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Email from '../Email';
 import Nama from '../Nama';
 import Password from '../Password';
+import {RouteProp} from '@react-navigation/native';
 
 export type routerRegParams = {
   Handphone: any;
   Email: any;
-  Nama: any;
-  Password: any;
+  Nama:  {email: string; nama: string; telp: string; pass: string};
+  Password: {email: string; nama: string; telp: string; pass: string};
 };
+
+export type RootRouteProps<RouteName extends keyof routerRegParams> = RouteProp<
+  routerRegParams,
+  RouteName
+>;
 
 const RegRouter = () => {
   const StackReg = createNativeStackNavigator();
