@@ -1,8 +1,12 @@
 /* eslint-disable prettier/prettier */
 import {View, SafeAreaView, Image, Text} from 'react-native';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {TextInput, TouchableOpacity} from 'react-native-gesture-handler';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
 import {KeyboardAvoidingScrollView} from 'react-native-keyboard-avoiding-scroll-view';
@@ -12,20 +16,54 @@ type ratingParams = {
   setRating: Function;
 };
 
+type orderData = {
+  id: number;
+  nama: string;
+  email: string;
+  alamat: string;
+  berat: number;
+  kusut: string;
+  rapi: string;
+  durasi: string;
+  biaya: number;
+  metode: string;
+  komentar: string;
+  tanggal: string;
+  is_done: number;
+  rating: number;
+};
+
 const Ulasan = () => {
   const [rating, setRating] = useState(0);
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
 
   const route = useRoute<RootRouteProps<'Ulasan'>>();
-  const foto = route.params.foto;
-  const nama = route.params.nama;
-  const berat = route.params.berat;
-  const harga = route.params.harga;
-  const durasi = route.params.durasi;
-  const rapi = route.params.rapi;
-  const kusut = route.params.kusut;
-  const metodePembayaran = route.params.payment;
+  const idOrder = route.params.id;
+
+  const defData = {
+    id: -1,
+    nama: '',
+    email: '',
+    alamat: '',
+    berat: -1,
+    kusut: '',
+    rapi: '',
+    durasi: '',
+    biaya: -1,
+    metode: '',
+    komentar: '',
+    tanggal: '',
+    is_done: -1,
+    rating: -1,
+  };
+
+  const [order, setOrder] = useState<orderData>(defData);
+  useFocusEffect(
+    useCallback(() => {
+      getOrderData(setOrder, idOrder);
+    }, [idOrder]),
+  );
 
   const [value, onChangeValue] = useState('');
   return (
@@ -53,13 +91,11 @@ const Ulasan = () => {
           <View className="flex-row border-[1px] border-gray-300 px-3 py-2 rounded-2xl box-border flex-wrap ">
             <Image
               className="h-12 w-12 rounded-full mr-2"
-              source={{uri: `https://i.pravatar.cc/150?u=${foto}`}}
+              source={{uri: `https://i.pravatar.cc/150?u=${order.email}`}}
             />
             <View className="flex flex-row justify-between items-center w-4/5">
               <View className="flex justify-center space-y-1">
-                <Text className="text-lg text-black -mb-1">
-                  {route.params.nama}
-                </Text>
+                <Text className="text-lg text-black -mb-1">{order.nama}</Text>
               </View>
               <View className="flex flex-row items-center">
                 <Text className="text-base text-black">4.3</Text>
@@ -88,18 +124,28 @@ const Ulasan = () => {
           <TouchableOpacity
             className="w-full bg-primary py-2 rounded-3xl"
             onPress={() => {
-              navigationOrder.push('Review', {
-                foto: foto,
-                nama: nama,
-                berat: berat,
-                harga: harga,
-                durasi: durasi,
-                rapi: rapi,
-                kusut: kusut,
-                rating: rating,
+              const data = {
                 komentar: value,
-                payment: metodePembayaran,
-              });
+                rating: rating,
+              };
+              try {
+                fetch(`http://10.0.2.2:4000/order/${idOrder}`, {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then(response => response.json())
+                  .then(json => {
+                    console.log(json.data[0]);
+                    navigationOrder.push('Review', {
+                      id: idOrder,
+                    });
+                  });
+              } catch (err) {
+                console.log('error try catch');
+              }
             }}>
             <Text className="text-base font-bold text-white w-full text-center">
               Kirim Ulasan
@@ -184,6 +230,18 @@ const OnStar = () => {
 
 const OffStar = () => {
   return <Image source={require('../../../icons/rating.png')} />;
+};
+
+const getOrderData = (set: Function, id: number) => {
+  try {
+    fetch(`http://10.0.2.2:4000/order/${id}`)
+      .then(response => response.json())
+      .then(json => {
+        set(json.data[0]);
+      });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export default Ulasan;

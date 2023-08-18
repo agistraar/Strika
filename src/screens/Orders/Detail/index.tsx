@@ -31,6 +31,11 @@ type confirParams = {
   kusut: string;
   rapi: string;
   durasi: string;
+  alamat: string;
+};
+
+type alamatParams = {
+  alamat: string;
 };
 
 const Detail = () => {
@@ -40,6 +45,7 @@ const Detail = () => {
   const rapi = route.params.rapi;
   const durasi = route.params.durasi;
   const berat = route.params.berat;
+  const alamat = route.params.alamat;
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
@@ -57,7 +63,7 @@ const Detail = () => {
         showsVerticalScrollIndicator={false}
         className="w-full h-fit box-border">
         <Metode kusut={kusut} rapi={rapi} />
-        <Alamat />
+        <Alamat alamat={alamat} />
         <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl mt-4">
           <Text className="text-black text-base">Berat Pakaian</Text>
           <Text className="text-black text-base font-bold">
@@ -77,6 +83,7 @@ const Detail = () => {
           kusut={kusut}
           rapi={rapi}
           durasi={durasi}
+          alamat={alamat}
         />
       </ScrollView>
     </SafeAreaView>
@@ -101,7 +108,7 @@ const Metode = ({kusut, rapi}: metodeParams) => {
   );
 };
 
-const Alamat = () => {
+const Alamat = ({alamat}: alamatParams) => {
   return (
     <View className="w-full flex mt-4">
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
@@ -116,9 +123,7 @@ const Alamat = () => {
       </View>
       <View className="flex border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
         <Text className="text-black text-base font-bold">Rumah</Text>
-        <Text className="text-black text-base">
-          Jl. Adi Sucipto, Gg. Fitrah, No. 356
-        </Text>
+        <Text className="text-black text-base">{alamat}</Text>
       </View>
     </View>
   );
@@ -201,7 +206,7 @@ const Info = () => {
   );
 };
 
-const BtnKonfirmasi = ({berat, kusut, rapi, durasi}: confirParams) => {
+const BtnKonfirmasi = ({berat, kusut, rapi, durasi, alamat}: confirParams) => {
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
   return (
@@ -213,6 +218,7 @@ const BtnKonfirmasi = ({berat, kusut, rapi, durasi}: confirParams) => {
           kusut: kusut,
           rapi: rapi,
           durasi: durasi,
+          alamat: alamat,
         });
       }}>
       <View className="w-full rounded-3xl bg-primary flex justify-center items-center py-2 mb-4">

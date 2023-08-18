@@ -169,8 +169,14 @@ const Password = () => {
               })
                 .then(response => response.json())
                 .then(() => {
-                  navigationReg.popToTop();
-                  navigation.popToTop();
+                  navigationReg.reset({
+                    index: 0,
+                    routes: [{name: 'Handphone'}],
+                  });
+                  navigation.reset({
+                    index: 0,
+                    routes: [{name: 'Login'}],
+                  });
                   setModalVisible(false);
                 });
             } catch (err) {

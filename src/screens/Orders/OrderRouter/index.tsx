@@ -9,39 +9,28 @@ import Review from '../Review';
 import {RouteProp} from '@react-navigation/native';
 
 export type routeOrderParams = {
-  Detail: {berat: number; kusut: string; rapi: string; durasi: string};
-  Mitra: {berat: number; kusut: string; rapi: string; durasi: string};
-  OrderInfo: {
+  Detail: {
     berat: number;
     kusut: string;
     rapi: string;
     durasi: string;
-    harga: string;
-    foto: string;
-    nama: string;
-    payment: string;
+    alamat: string;
+  };
+  Mitra: {
+    berat: number;
+    kusut: string;
+    rapi: string;
+    durasi: string;
+    alamat: string;
+  };
+  OrderInfo: {
+    id: number;
   };
   Ulasan: {
-    berat: number;
-    kusut: string;
-    rapi: string;
-    durasi: string;
-    harga: string;
-    foto: string;
-    nama: string;
-    payment: string;
+    id: number;
   };
   Review: {
-    berat: number;
-    kusut: string;
-    rapi: string;
-    durasi: string;
-    harga: string;
-    foto: string;
-    nama: string;
-    payment: string;
-    rating: number;
-    komentar: string;
+    id: number;
   };
 };
 

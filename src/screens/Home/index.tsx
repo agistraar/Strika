@@ -26,9 +26,20 @@ type profilParams = {
   nama: string;
 };
 
+type navbarParams = {
+  alamat: string;
+};
+
+type infoParams = {
+  id: number;
+  nama: string;
+  email: string;
+};
+
 const Home = () => {
   const {userId} = useGlobalContext();
   const [data, setData] = useState({nama: '', email: '', telp: '', alamat: ''});
+  const [goingOrder, setGoingOrder] = useState({id: 0, nama: '', email: ''});
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
 
@@ -36,6 +47,7 @@ const Home = () => {
     useCallback(() => {
       if (userId !== 0) {
         GetData(userId, setData, navigation);
+        GetGoingOrders(userId, setGoingOrder);
       } else {
         navigation.reset({
           index: 0,
@@ -54,11 +66,18 @@ const Home = () => {
             <CardMember />
           </View>
         </View>
-        <InfoSetrika />
+
+        {goingOrder.id === 0 ? null : (
+          <InfoSetrika
+            id={goingOrder.id}
+            nama={goingOrder.nama}
+            email={goingOrder.email}
+          />
+        )}
         <Paket />
         <Berita />
       </ScrollView>
-      <BotNavBar />
+      <BotNavBar alamat={data.alamat} />
       <Toast position="top" topOffset={20} />
     </SafeAreaView>
   );
@@ -107,47 +126,60 @@ const CardMember = () => {
   );
 };
 
-const InfoSetrika = () => {
+const InfoSetrika = ({id, nama, email}: infoParams) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
   return (
     <View className=" flex w-full items-center justify-center mt-4">
-      <View className=" flex flex-col p-3 w-11/12 h-fit border-[1px] border-gray-300 rounded-t-3xl">
-        <View className="flex flex-row items-center w-full h-fit space-x-2 ">
-          <Image
-            className="w-8 h-8"
-            source={require('../../icons/clock.png')}
-          />
-          <Text className="text-lg text-black">Pakaian Sedang Disetrika</Text>
-        </View>
-      </View>
-      <View className=" flex flex-col p-2 w-11/12  h-fit border-[1px] border-t-0 border-gray-300 rounded-b-3xl">
-        <View className="flex flex-row max-w-full box-border p-1">
-          <Image
-            className="h-12 w-12 rounded-full mr-2"
-            source={{uri: 'https://i.pravatar.cc/150?u=yoimiya@gmail.com'}}
-          />
-          <View className="flex flex-row justify-between items-center w-4/5">
-            <View className="flex justify-center space-y-1">
-              <Text className="text-base text-black -mb-1">Ibu Yoimiya</Text>
-              <View className="flex flex-row items-center">
-                <Text className="text-sm text-black">4.3</Text>
-                <Image
-                  source={require('../../icons/star.png')}
-                  className="w-5 h-5"
-                />
-              </View>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                fiturToast();
-              }}>
-              <Image
-                className="w-8 h-8"
-                source={require('../../icons/chat.png')}
-              />
-            </TouchableOpacity>
+      <TouchableOpacity
+        className="flex w-full items-center justify-center"
+        onPress={() => {
+          navigation.push('OrderRouter', {
+            screen: 'OrderInfo',
+            params: {
+              id: id,
+            },
+          });
+        }}>
+        <View className=" flex flex-col p-3 w-11/12 h-fit border-[1px] border-gray-300 rounded-t-3xl">
+          <View className="flex flex-row items-center w-full h-fit space-x-2 ">
+            <Image
+              className="w-8 h-8"
+              source={require('../../icons/clock.png')}
+            />
+            <Text className="text-lg text-black">Pakaian Sedang Disetrika</Text>
           </View>
         </View>
-      </View>
+        <View className=" flex flex-col p-2 w-11/12  h-fit border-[1px] border-t-0 border-gray-300 rounded-b-3xl">
+          <View className="flex flex-row max-w-full box-border p-1">
+            <Image
+              className="h-12 w-12 rounded-full mr-2"
+              source={{uri: `https://i.pravatar.cc/150?u=${email}`}}
+            />
+            <View className="flex flex-row justify-between items-center w-4/5">
+              <View className="flex justify-center space-y-1">
+                <Text className="text-base text-black -mb-1">{nama}</Text>
+                <View className="flex flex-row items-center">
+                  <Text className="text-sm text-black">4.3</Text>
+                  <Image
+                    source={require('../../icons/star.png')}
+                    className="w-5 h-5"
+                  />
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  fiturToast();
+                }}>
+                <Image
+                  className="w-8 h-8"
+                  source={require('../../icons/chat.png')}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -244,7 +276,7 @@ const CardBerita = () => {
   );
 };
 
-const BotNavBar = () => {
+const BotNavBar = ({alamat}: navbarParams) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   const [modalVisible, setModalVisible] = useState(false);
@@ -252,7 +284,12 @@ const BotNavBar = () => {
     <View className=" w-full h-16 flex flex-row p-2 px-8 items-center justify-between bg-white absolute bottom-0 rounded-t-2xl">
       <View className=" h-fit w-1/3 flex flex-row items-center justify-between pr-2">
         <Image source={require('../../icons/home-on.png')} />
-        <Image source={require('../../icons/order.png')} />
+        <TouchableOpacity
+          onPress={() => {
+            navigation.push('History');
+          }}>
+          <Image source={require('../../icons/order.png')} />
+        </TouchableOpacity>
       </View>
       <View className=" h-fit w-1/3 flex flex-row items-center justify-between pl-2">
         <TouchableOpacity
@@ -283,6 +320,7 @@ const BotNavBar = () => {
         visible={modalVisible}
         set={setModalVisible}
         setParent={setModalVisible}
+        alamat={alamat}
       />
     </View>
   );
@@ -311,7 +349,6 @@ const GetData = (
     fetch(`http://10.0.2.2:4000/pelanggan/getInfoPelanggan?id=${id}`)
       .then(response => response.json())
       .then(json => {
-        console.log(json);
         set({
           nama: json.data[0].nama,
           email: json.data[0].email,
@@ -324,6 +361,27 @@ const GetData = (
       });
   } catch (err) {
     console.log(err);
+  }
+};
+
+const GetGoingOrders = (id: number, set: Function) => {
+  try {
+    fetch(`http://10.0.2.2:4000/order/going/${id}`)
+      .then(response => response.json())
+      .then(json => {
+        if (json.code === 200) {
+          set({
+            id: json.data[0].id,
+            nama: json.data[0].nama,
+            email: json.data[0].email,
+          });
+        } else {
+          set({id: 0, nama: '', email: ''});
+        }
+      });
+  } catch (err) {
+    console.log(err);
+    set({id: 0, nama: '', email: ''});
   }
 };
 

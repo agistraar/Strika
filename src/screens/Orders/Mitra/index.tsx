@@ -10,13 +10,17 @@ import {
   FlatList,
   RefreshControl,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import Data from '../../../data/data.json';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import {useGlobalContext} from '../../../context/context';
 
 type menuParams = {
   judul: string;
@@ -30,7 +34,8 @@ type cardParams = {
   harga: number;
   reguler: number;
   kilat: number;
-  jumBerat: number;
+  beratKilat: number;
+  beratReguler: number;
 };
 
 type modalParams = {
@@ -39,8 +44,7 @@ type modalParams = {
   setParent: Function;
   reset: Function;
   biaya: number;
-  foto: string;
-  nama: string;
+  id: number;
 };
 
 type paymentModalParams = {
@@ -64,8 +68,25 @@ type conPemAfterParams = {
   label: string;
 };
 
+type mitraData = {
+  id: number;
+  nama: string;
+  email: string;
+  alamat: string;
+  reguler: number;
+  kilat: number;
+  harga: number;
+  antrian_reg: number;
+  antrian_kil: number;
+};
+
 const Mitra = () => {
-  const user = Data.mitra;
+  const [mitra, setMitra] = useState<[mitraData]>();
+  useFocusEffect(
+    useCallback(() => {
+      getAllMitra(setMitra);
+    }, []),
+  );
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
 
@@ -73,9 +94,9 @@ const Mitra = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    setMitra(undefined);
+    getAllMitra(setMitra);
+    setRefreshing(false);
   }, []);
   return (
     <SafeAreaView className="w-full h-full flex bg-white">
@@ -100,8 +121,11 @@ const Mitra = () => {
       </View>
       <FlatList
         className="w-full px-5 py-2"
-        data={user}
+        data={mitra}
         showsVerticalScrollIndicator={false}
+        maxToRenderPerBatch={4}
+        updateCellsBatchingPeriod={50}
+        initialNumToRender={4}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -109,12 +133,13 @@ const Mitra = () => {
           <CardMitra
             id={item.id}
             nama={item.nama}
-            foto={item.foto}
+            foto={item.email}
             alamat={item.alamat}
             harga={item.harga}
             reguler={item.reguler}
             kilat={item.kilat}
-            jumBerat={item.berat}
+            beratKilat={item.antrian_kil}
+            beratReguler={item.antrian_reg}
           />
         )}
       />
@@ -142,110 +167,104 @@ const SortMenu = ({judul}: menuParams) => {
   );
 };
 
-const CardMitra = ({
-  id,
-  nama,
-  foto,
-  alamat,
-  harga,
-  reguler,
-  kilat,
-  jumBerat,
-}: cardParams) => {
-  const route = useRoute<RootRouteProps<'Mitra'>>();
-  const berat = route.params.berat;
-  const durasi = route.params.durasi;
-  const [isFocused, setIsFocused] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const formatter = new Intl.NumberFormat('id-ID', {
-    minimumFractionDigits: 0,
-  });
-  const sisaEstimasi = id % 2 === 0 ? kilat * jumBerat : reguler + jumBerat;
-  const estimasi =
-    durasi === 'Kilat'
-      ? berat * kilat + sisaEstimasi
-      : berat * reguler + sisaEstimasi;
-  const waktuEstimasi = {jam: 0, menit: 0};
-  if (estimasi < 60) {
-    waktuEstimasi.menit = estimasi;
-  } else {
-    waktuEstimasi.jam = parseInt((estimasi / 60).toString(), 10);
-    waktuEstimasi.menit = parseInt((estimasi % 60).toString(), 10);
-  }
-  let teksEstimasi = '';
-  if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit !== 0) {
-    teksEstimasi = `${waktuEstimasi.jam} Jam ${waktuEstimasi.menit} Menit`;
-  } else if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit === 0) {
-    teksEstimasi = `${waktuEstimasi.jam} Jam`;
-  } else {
-    teksEstimasi = `${waktuEstimasi.menit} Menit`;
-  }
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        setIsFocused(!isFocused);
-        setModalVisible(true);
-      }}>
-      <View
-        className={`w-full mb-4 border-[1px] rounded-2xl ${
-          isFocused ? 'bg-primary border-white' : 'bg-white border-gray-300'
-        }`}>
+const CardMitra = memo(
+  ({
+    id,
+    nama,
+    foto,
+    alamat,
+    harga,
+    reguler,
+    kilat,
+    beratKilat,
+    beratReguler,
+  }: cardParams) => {
+    const route = useRoute<RootRouteProps<'Mitra'>>();
+    const berat = route.params.berat;
+    const durasi = route.params.durasi;
+    const [isFocused, setIsFocused] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const formatter = new Intl.NumberFormat('id-ID', {
+      minimumFractionDigits: 0,
+    });
+    const sisaEstimasi = beratKilat * kilat + beratReguler * reguler;
+    const estimasi =
+      durasi === 'Kilat'
+        ? berat * kilat + sisaEstimasi
+        : berat * reguler + sisaEstimasi;
+    const waktuEstimasi = {jam: 0, menit: 0};
+    if (estimasi < 60) {
+      waktuEstimasi.menit = estimasi;
+    } else {
+      waktuEstimasi.jam = parseInt((estimasi / 60).toString(), 10);
+      waktuEstimasi.menit = parseInt((estimasi % 60).toString(), 10);
+    }
+    let teksEstimasi = '';
+    if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit !== 0) {
+      teksEstimasi = `${waktuEstimasi.jam} Jam ${waktuEstimasi.menit} Menit`;
+    } else if (waktuEstimasi.jam !== 0 && waktuEstimasi.menit === 0) {
+      teksEstimasi = `${waktuEstimasi.jam} Jam`;
+    } else {
+      teksEstimasi = `${waktuEstimasi.menit} Menit`;
+    }
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          setIsFocused(!isFocused);
+          setModalVisible(true);
+        }}>
         <View
-          className={`w-full flex items-start border-b-[1px] ${
-            isFocused ? 'border-white' : 'border-gray-300'
-          } p-2 px-4 `}>
-          <View className=" w-full flex flex-row justify-between ">
-            <View className="flex flex-row items-center space-x-2 w-fit">
-              <Image
-                source={{uri: `https://i.pravatar.cc/150?u=${foto}`}}
-                className="h-10 w-10 rounded-full"
-              />
-              <Text className="text-base text-black font-bold">{nama}</Text>
+          className={`w-full mb-4 border-[1px] rounded-2xl ${
+            isFocused ? 'bg-primary border-white' : 'bg-white border-gray-300'
+          }`}>
+          <View
+            className={`w-full flex items-start border-b-[1px] ${
+              isFocused ? 'border-white' : 'border-gray-300'
+            } p-2 px-4 `}>
+            <View className=" w-full flex flex-row justify-between ">
+              <View className="flex flex-row items-center space-x-2 w-fit">
+                <Image
+                  source={{uri: `https://i.pravatar.cc/150?u=${foto}`}}
+                  className="h-10 w-10 rounded-full"
+                />
+                <Text className="text-base text-black font-bold">{nama}</Text>
+              </View>
+              <View className="flex flex-row items-center">
+                <Text className="text-sm text-black">4.3</Text>
+                <Image
+                  source={require('../../../icons/star.png')}
+                  className="w-5 h-5"
+                />
+              </View>
             </View>
-            <View className="flex flex-row items-center">
-              <Text className="text-sm text-black">4.3</Text>
-              <Image
-                source={require('../../../icons/star.png')}
-                className="w-5 h-5"
-              />
-            </View>
+            <Text className="text-base text-black mt-2">{alamat}</Text>
           </View>
-          <Text className="text-base text-black mt-2">{alamat}</Text>
-        </View>
-        <View className="w-full flex flex-row justify-between items-center p-2 px-4">
-          <Text className="text-lg text-black font-bold">
-            {formatter.format(harga + 1300)}/Kg
-          </Text>
-          <View className="flex items-end">
-            <Text className="text-sm text-black">Estimasi Pengerjaan</Text>
-            <Text className="text-base text-black font-bold">
-              {teksEstimasi}
+          <View className="w-full flex flex-row justify-between items-center p-2 px-4">
+            <Text className="text-lg text-black font-bold">
+              {formatter.format(harga + 1300)}/Kg
             </Text>
+            <View className="flex items-end">
+              <Text className="text-sm text-black">Estimasi Pengerjaan</Text>
+              <Text className="text-base text-black font-bold">
+                {teksEstimasi}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <BgModal
-        visible={modalVisible}
-        set={setModalVisible}
-        setParent={setModalVisible}
-        reset={setIsFocused}
-        biaya={harga}
-        foto={foto}
-        nama={nama}
-      />
-    </TouchableOpacity>
-  );
-};
+        <BgModal
+          visible={modalVisible}
+          set={setModalVisible}
+          setParent={setModalVisible}
+          reset={setIsFocused}
+          biaya={harga}
+          id={id}
+        />
+      </TouchableOpacity>
+    );
+  },
+);
 
-const BgModal = ({
-  visible,
-  set,
-  setParent,
-  reset,
-  biaya,
-  foto,
-  nama,
-}: modalParams) => {
+const BgModal = ({visible, set, setParent, reset, biaya, id}: modalParams) => {
   const [menuVisible, setMenuVisible] = useState(false);
   return (
     <Modal
@@ -266,8 +285,7 @@ const BgModal = ({
         setParent={setParent}
         reset={reset}
         biaya={biaya}
-        foto={foto}
-        nama={nama}
+        id={id}
       />
       <View className="h-screen w-full bg-black/25 items-center justify-center -z-10" />
     </Modal>
@@ -280,9 +298,9 @@ const BottomModal = ({
   setParent,
   reset,
   biaya,
-  foto,
-  nama,
+  id,
 }: modalParams) => {
+  const {userId} = useGlobalContext();
   const formatter = new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 0,
   });
@@ -384,19 +402,37 @@ const BottomModal = ({
             if (selectedPayment === '') {
               paymentToast();
             } else {
-              set(false);
-              setParent(false);
-              reset(false);
-              navigationOrder.push('OrderInfo', {
+              const data = {
+                idPelanggan: userId,
+                idMitra: id,
                 berat: berat,
-                harga: String(biaya + 1300),
-                foto: foto,
-                nama: nama,
+                kusut: kusut,
+                rapi: rapi,
                 durasi: durasi,
-                rapi: route.params.rapi,
-                kusut: route.params.kusut,
-                payment: selectedPayment,
-              });
+                biaya: totalHarga,
+                metode: selectedPayment,
+              };
+              try {
+                fetch('http://10.0.2.2:4000/order', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then(response => response.json())
+                  .then(json => {
+                    set(false);
+                    setParent(false);
+                    reset(false);
+                    navigationOrder.push('OrderInfo', {
+                      id: json.data[0].id,
+                    });
+                  });
+              } catch (err) {
+                console.log('error try catch');
+                errorToast();
+              }
             }
           }}>
           <Text className="text-base font-bold text-white w-full text-center">
@@ -537,10 +573,32 @@ const iconPembayaran = (metode: string) => {
   }
 };
 
+const getAllMitra = (set: Function) => {
+  try {
+    fetch('http://10.0.2.2:4000/mitra/all')
+      .then(response => response.json())
+      .then(json => {
+        set(json.data);
+      });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const paymentToast = () => {
   Toast.show({
     type: 'error',
     text1: 'Silahkan Pilih Metode Pembayaran',
+    autoHide: true,
+    visibilityTime: 3000,
+  });
+};
+
+const errorToast = () => {
+  Toast.show({
+    type: 'error',
+    text1: 'Order Gagal',
+    text2: 'Silahkan Coba Lagi Dalam Beberapa Saat',
     autoHide: true,
     visibilityTime: 3000,
   });

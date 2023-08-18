@@ -19,9 +19,10 @@ type modalParams = {
   visible: boolean;
   set: Function;
   setParent: Function;
+  alamat: string;
 };
 
-const OrderModal = ({visible, set, setParent}: modalParams) => {
+const OrderModal = ({visible, set, setParent, alamat}: modalParams) => {
   const [menuVisible, setMenuVisible] = useState(false);
   return (
     <Modal
@@ -38,13 +39,14 @@ const OrderModal = ({visible, set, setParent}: modalParams) => {
         visible={menuVisible}
         set={setMenuVisible}
         setParent={setParent}
+        alamat={alamat}
       />
       <View className="h-screen w-full bg-black/25 items-center justify-center -z-10" />
     </Modal>
   );
 };
 
-const BottomModal = ({visible, set, setParent}: modalParams) => {
+const BottomModal = ({visible, set, setParent, alamat}: modalParams) => {
   const [berat, onChangeBerat] = useState('0');
   const [openKusut, setOpenKusut] = useState(false);
   const [openRapi, setOpenRapi] = useState(false);
@@ -227,6 +229,7 @@ const BottomModal = ({visible, set, setParent}: modalParams) => {
                   kusut: selectedKusut,
                   rapi: selectedRapi,
                   durasi: selectedDurasi,
+                  alamat: alamat,
                 },
               });
               set(false);

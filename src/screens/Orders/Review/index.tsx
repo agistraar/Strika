@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   BackHandler,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {ScrollView} from 'react-native-gesture-handler';
 import {
   useFocusEffect,
@@ -26,7 +26,6 @@ type metodeParams = {
 type hargaParams = {
   biaya: number;
   durasi: string;
-  berat: number;
   rapi: string;
   kusut: string;
 };
@@ -39,29 +38,61 @@ type komentarParams = {
   value: string;
 };
 
+type orderData = {
+  id: number;
+  nama: string;
+  email: string;
+  alamat: string;
+  berat: number;
+  kusut: string;
+  rapi: string;
+  durasi: string;
+  biaya: number;
+  metode: string;
+  komentar: string;
+  tanggal: string;
+  is_done: number;
+  rating: number;
+};
+
 const Review = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
   const route = useRoute<RootRouteProps<'Review'>>();
+  const idOrder = route.params.id;
 
-  const nama = route.params.nama;
-  const foto = route.params.foto;
-  const berat = route.params.berat;
-  const durasi = route.params.durasi;
-  const harga = route.params.harga;
-  const kusut = route.params.kusut;
-  const rapi = route.params.rapi;
-  const rating = route.params.rating;
-  const komentar = route.params.komentar;
-  const metodePembayaran = route.params.payment;
+  const defData = {
+    id: -1,
+    nama: '',
+    email: '',
+    alamat: '',
+    berat: -1,
+    kusut: '',
+    rapi: '',
+    durasi: '',
+    biaya: -1,
+    metode: '',
+    komentar: '',
+    tanggal: '',
+    is_done: -1,
+    rating: -1,
+  };
 
+  const [order, setOrder] = useState<orderData>(defData);
   useFocusEffect(
     React.useCallback(() => {
+      getOrderData(setOrder, idOrder);
       const onBackPress = () => {
-        navigationOrder.popToTop();
-        navigation.popToTop();
+        navigationOrder.reset({
+          index: 0,
+          routes: [{name: 'Detail'}],
+        });
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        });
         return true;
       };
 
@@ -69,7 +100,7 @@ const Review = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation, navigationOrder]),
+    }, [idOrder, navigation, navigationOrder]),
   );
 
   return (
@@ -77,8 +108,14 @@ const Review = () => {
       <View className="w-full px-6 flex flex-row items-center space-x-3 mb-2">
         <TouchableOpacity
           onPress={() => {
-            navigationOrder.popToTop();
-            navigation.popToTop();
+            navigationOrder.reset({
+              index: 0,
+              routes: [{name: 'Detail'}],
+            });
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Home'}],
+            });
           }}>
           <Image source={require('../../../icons/back.png')} />
         </TouchableOpacity>
@@ -90,12 +127,12 @@ const Review = () => {
             <Image
               className="h-12 w-12 rounded-full mr-2"
               source={{
-                uri: `https://i.pravatar.cc/150?u=${foto}`,
+                uri: `https://i.pravatar.cc/150?u=${order.email}`,
               }}
             />
             <View className="flex flex-row justify-between items-center w-4/5">
               <View className="flex justify-center space-y-1">
-                <Text className="text-lg text-black -mb-1">{nama}</Text>
+                <Text className="text-lg text-black -mb-1">{order.nama}</Text>
               </View>
               <View className="flex flex-row items-center">
                 <Text className="text-base text-black">4.3</Text>
@@ -107,7 +144,7 @@ const Review = () => {
             </View>
           </View>
           <View>
-            <Metode kusut={kusut} rapi={rapi} />
+            <Metode kusut={order.kusut} rapi={order.rapi} />
           </View>
           <View>
             <Alamat />
@@ -115,16 +152,15 @@ const Review = () => {
           <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
             <Text className="text-black text-base">Berat Pakaian</Text>
             <Text className="text-black text-base font-bold">
-              {berat.toString().replace('.', ',')}Kg
+              {order.berat?.toString().replace('.', ',')}Kg
             </Text>
           </View>
           <View>
             <Harga
-              berat={berat}
-              durasi={durasi}
-              biaya={parseInt(harga, 10)}
-              rapi={rapi}
-              kusut={kusut}
+              durasi={order.durasi}
+              biaya={order.biaya}
+              rapi={order.rapi}
+              kusut={order.kusut}
             />
           </View>
           <View>
@@ -132,14 +168,14 @@ const Review = () => {
               <Text className="text-black text-base">Metode Pembayaran</Text>
             </View>
             <View className="flex flex-row items-center justify-start border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
-              {iconPembayaran(metodePembayaran)}
+              {iconPembayaran(order.metode)}
             </View>
           </View>
           <View>
-            <Rating ratingValue={rating} />
+            <Rating ratingValue={order.rating} />
           </View>
           <View>
-            <Komentar value={komentar} />
+            <Komentar value={order.komentar} />
           </View>
           <TouchableOpacity
             className="w-full bg-white border-rose-600 border-[1px] py-2 rounded-3xl"
@@ -195,10 +231,8 @@ const Alamat = () => {
   );
 };
 
-const Harga = ({biaya, durasi, berat, rapi, kusut}: hargaParams) => {
-  const formatter = new Intl.NumberFormat('id-ID', {
-    minimumFractionDigits: 0,
-  });
+const Harga = ({biaya, durasi, rapi, kusut}: hargaParams) => {
+  const totalHarga = biaya;
   let ongkir = 0;
   if (kusut === 'Diambil') {
     ongkir += 5000;
@@ -206,10 +240,13 @@ const Harga = ({biaya, durasi, berat, rapi, kusut}: hargaParams) => {
   if (rapi === 'Diantar') {
     ongkir += 5000;
   }
-  const harga = biaya * berat;
+  const harga =
+    durasi === 'Kilat' ? (totalHarga - ongkir) / 2 : totalHarga - ongkir;
   const kelipatanDurasi =
-    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
+    durasi === 'Kilat' ? '2x lipat Harga Awal' : 'Tidak ada kelipatan';
+  const formatter = new Intl.NumberFormat('id-ID', {
+    minimumFractionDigits: 0,
+  });
   return (
     <View className="w-full flex">
       <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-t-3xl">
@@ -322,6 +359,18 @@ const iconPembayaran = (metode: string) => {
     return (
       <Image source={require('../../../icons/ovo.png')} className="h-8 w-20" />
     );
+  }
+};
+
+const getOrderData = (set: Function, id: number) => {
+  try {
+    fetch(`http://10.0.2.2:4000/order/${id}`)
+      .then(response => response.json())
+      .then(json => {
+        set(json.data[0]);
+      });
+  } catch (err) {
+    console.log(err);
   }
 };
 

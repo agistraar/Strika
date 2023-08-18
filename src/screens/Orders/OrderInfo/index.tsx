@@ -1,14 +1,26 @@
 /* eslint-disable prettier/prettier */
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  BackHandler,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useCallback, useMemo, useRef, useState} from 'react';
 import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 import BottomSheet from '@gorhom/bottom-sheet';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootRouteProps, routeOrderParams} from '../OrderRouter';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Dimensions} from 'react-native';
 import Lottie from 'lottie-react-native';
+import {RootStackParams} from '../../../Router';
 
 type progressParams = {
   status: string;
@@ -18,9 +30,33 @@ type progressParams = {
 type hargaParams = {
   biaya: number;
   durasi: string;
+  kusut: string;
+  rapi: string;
+};
+
+type orderData = {
+  id: number;
+  nama: string;
+  email: string;
+  alamat: string;
   berat: number;
   kusut: string;
   rapi: string;
+  durasi: string;
+  biaya: number;
+  metode: string;
+  komentar: string;
+  tanggal: string;
+  is_done: number;
+  rating: number;
+};
+
+type sheetParams = {
+  data: orderData;
+};
+
+type mainParams = {
+  set: Function;
 };
 
 const OrderInfo = () => {
@@ -29,7 +65,7 @@ const OrderInfo = () => {
     setIsLoading(false);
   }, 2000);
 
-  return isLoading ? <SplashScreen /> : <MainScreen />;
+  return isLoading ? <SplashScreen /> : <MainScreen set={setIsLoading} />;
 };
 
 const SplashScreen = () => {
@@ -55,9 +91,56 @@ const SplashScreen = () => {
   );
 };
 
-const MainScreen = () => {
+const MainScreen = ({set}: mainParams) => {
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParams>>();
+  const route = useRoute<RootRouteProps<'OrderInfo'>>();
+  const idOrder = route.params.id;
+
+  const defData = {
+    id: -1,
+    nama: '',
+    email: '',
+    alamat: '',
+    berat: -1,
+    kusut: '',
+    rapi: '',
+    durasi: '',
+    biaya: -1,
+    metode: '',
+    komentar: '',
+    tanggal: '',
+    is_done: -1,
+    rating: -1,
+  };
+
+  const [order, setOrder] = useState<orderData>(defData);
+  useFocusEffect(
+    useCallback(() => {
+      getOrderData(setOrder, idOrder);
+      set(false);
+      const onBackPress = () => {
+        navigationOrder.reset({
+          index: 0,
+          routes: [{name: 'Detail'}],
+        });
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        });
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [idOrder, navigation, navigationOrder, set]),
+  );
+
+  console.log('mainScreen: ' + order);
 
   const lat = -0.053210907997147096;
   const long = 109.347239297138674;
@@ -83,19 +166,26 @@ const MainScreen = () => {
       <View className="absolute top-4 left-4 self-start">
         <TouchableOpacity
           onPress={() => {
-            navigationOrder.pop();
+            navigationOrder.reset({
+              index: 0,
+              routes: [{name: 'Detail'}],
+            });
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Home'}],
+            });
           }}>
           <View className="bg-transparent items-center justify-center rounded-full border-[1px] p-1">
             <Image source={require('../../../icons/back.png')} />
           </View>
         </TouchableOpacity>
       </View>
-      <BotSheet />
+      <BotSheet data={order} />
     </View>
   );
 };
 
-const BotSheet = () => {
+const BotSheet = ({data}: sheetParams) => {
   const navigationOrder =
     useNavigation<NativeStackNavigationProp<routeOrderParams>>();
   // ref
@@ -109,16 +199,7 @@ const BotSheet = () => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const route = useRoute<RootRouteProps<'OrderInfo'>>();
-
-  const foto = route.params.foto;
-  const nama = route.params.nama;
-  const berat = route.params.berat;
-  const harga = route.params.harga;
-  const durasi = route.params.durasi;
-  const rapi = route.params.rapi;
-  const kusut = route.params.kusut;
-  const metodePembayaran = route.params.payment;
+  console.log('dataSheet ni2: ' + data.alamat);
 
   return (
     <BottomSheet
@@ -132,13 +213,11 @@ const BotSheet = () => {
           <View className="flex-row border-[1px] border-gray-300 px-3 py-2 rounded-2xl box-border flex-wrap ">
             <Image
               className="h-12 w-12 rounded-full mr-2"
-              source={{uri: `https://i.pravatar.cc/150?u=${foto}`}}
+              source={{uri: `https://i.pravatar.cc/150?u=${data.email}`}}
             />
             <View className="flex flex-row justify-between items-center w-4/5">
               <View className="flex justify-center space-y-1">
-                <Text className="text-base text-black -mb-1">
-                  {route.params.nama}
-                </Text>
+                <Text className="text-base text-black -mb-1">{data.nama}</Text>
                 <View className="flex flex-row items-center">
                   <Text className="text-sm text-black">4.3</Text>
                   <Image
@@ -159,9 +238,7 @@ const BotSheet = () => {
             </View>
             <View className="flex border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
               <Text className="text-black text-base font-bold">Rumah</Text>
-              <Text className="text-black text-base">
-                Jl. Adi Sucipto, Gg. Fitrah, No. 356
-              </Text>
+              <Text className="text-black text-base">{data.alamat}</Text>
             </View>
           </View>
           <View>
@@ -180,24 +257,23 @@ const BotSheet = () => {
               <Text className="text-black text-base">Metode Pembayaran</Text>
             </View>
             <View className="flex flex-row items-center justify-start border-[1px] border-gray-300 px-3 py-2 border-t-0 rounded-b-3xl">
-              {iconPembayaran(metodePembayaran)}
+              {iconPembayaran(data.metode)}
             </View>
           </View>
           <View>
             <View className="flex flex-row border-[1px] items-center justify-between border-gray-300 px-3 py-2 rounded-3xl">
               <Text className="text-black text-base">Berat Pakaian</Text>
               <Text className="text-black text-base font-bold">
-                {berat.toString().replace('.', ',')}Kg
+                {data.berat?.toString().replace('.', ',')}Kg
               </Text>
             </View>
           </View>
           <View>
             <Harga
-              biaya={parseInt(harga, 10)}
-              durasi={durasi}
-              berat={berat}
-              kusut={kusut}
-              rapi={rapi}
+              biaya={data.biaya}
+              durasi={data.durasi}
+              kusut={data.kusut}
+              rapi={data.rapi}
             />
           </View>
           <View className="flex space-y-3 pt-10">
@@ -205,14 +281,7 @@ const BotSheet = () => {
               className="w-full bg-primary py-2 rounded-3xl"
               onPress={() => {
                 navigationOrder.push('Ulasan', {
-                  foto: foto,
-                  nama: nama,
-                  berat: berat,
-                  harga: harga,
-                  durasi: durasi,
-                  rapi: rapi,
-                  kusut: kusut,
-                  payment: metodePembayaran,
+                  id: data.id,
                 });
               }}>
               <Text className="text-base font-bold text-white w-full text-center">
@@ -254,8 +323,8 @@ const Progress = ({status, isDone}: progressParams) => {
   );
 };
 
-const Harga = ({biaya, durasi, berat, kusut, rapi}: hargaParams) => {
-  const harga = biaya * berat;
+const Harga = ({biaya, durasi, kusut, rapi}: hargaParams) => {
+  const totalHarga = biaya;
   let ongkir = 0;
   if (kusut === 'Diambil') {
     ongkir += 5000;
@@ -263,9 +332,10 @@ const Harga = ({biaya, durasi, berat, kusut, rapi}: hargaParams) => {
   if (rapi === 'Diantar') {
     ongkir += 5000;
   }
+  const harga =
+    durasi === 'Kilat' ? (totalHarga - ongkir) / 2 : totalHarga - ongkir;
   const kelipatanDurasi =
-    durasi === 'Kilat' ? '2x lipat' : 'Tidak ada kelipatan';
-  const totalHarga = durasi === 'Kilat' ? harga * 2 + ongkir : harga + ongkir;
+    durasi === 'Kilat' ? '2x lipat Harga Awal' : 'Tidak ada kelipatan';
   const formatter = new Intl.NumberFormat('id-ID', {
     minimumFractionDigits: 0,
   });
@@ -276,7 +346,7 @@ const Harga = ({biaya, durasi, berat, kusut, rapi}: hargaParams) => {
       </View>
       <View className="w-full flex border-x-[1px] border-gray-300 px-4 py-2 space-y-2">
         <View className="w-full flex flex-row justify-between items-center">
-          <Text className="text-base text-black">Harga</Text>
+          <Text className="text-base text-black">Harga Awal</Text>
           <Text className="text-base text-black">
             {formatter.format(harga)}
           </Text>
@@ -334,6 +404,18 @@ const iconPembayaran = (metode: string) => {
     return (
       <Image source={require('../../../icons/ovo.png')} className="h-8 w-20" />
     );
+  }
+};
+
+const getOrderData = (set: Function, id: number) => {
+  try {
+    fetch(`http://10.0.2.2:4000/order/${id}`)
+      .then(response => response.json())
+      .then(json => {
+        set(json.data[0]);
+      });
+  } catch (err) {
+    console.log(err);
   }
 };
 

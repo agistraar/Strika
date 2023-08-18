@@ -26,6 +26,10 @@ type modalParams = {
   id: number;
 };
 
+type navbarParams = {
+  alamat: string;
+};
+
 const Main = () => {
   const {userId, setUserId} = useGlobalContext();
   const [data, setData] = useState({nama: '', email: '', telp: '', alamat: ''});
@@ -144,7 +148,7 @@ const Main = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <BotNavBar />
+      <BotNavBar alamat={data.alamat} />
       <LogoutModal
         visible={logoutVisible}
         set={setlogoutVisible}
@@ -158,7 +162,7 @@ const Main = () => {
   );
 };
 
-const BotNavBar = () => {
+const BotNavBar = ({alamat}: navbarParams) => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParams>>();
@@ -198,6 +202,7 @@ const BotNavBar = () => {
         visible={modalVisible}
         set={setModalVisible}
         setParent={setModalVisible}
+        alamat={alamat}
       />
     </View>
   );
